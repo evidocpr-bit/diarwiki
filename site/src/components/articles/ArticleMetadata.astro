@@ -1,4 +1,5 @@
 ---
+import { serializeJsonLd } from '../../lib/json-ld';
 import { getCollection } from 'astro:content';
 import ReviewBadge from '../ReviewBadge.astro';
 
@@ -58,7 +59,7 @@ const schema = {
   />
 </section>
 
-<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<script type="application/ld+json" set:html={serializeJsonLd(schema)} />
 
 <style>
   .article-intro {

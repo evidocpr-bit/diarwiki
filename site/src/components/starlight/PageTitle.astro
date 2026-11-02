@@ -1,4 +1,5 @@
 ---
+import { serializeJsonLd } from '../../lib/json-ld';
 import ReviewBadge from '../ReviewBadge.astro';
 import { contentRepository } from '../../lib/content';
 import { siteIdentity } from '../../config/site';
@@ -39,7 +40,7 @@ const schema = {
     </dl>
   </div>
 </section>
-<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<script type="application/ld+json" set:html={serializeJsonLd(schema)} />
 <div class="reading-progress" aria-hidden="true"><span></span></div>
 <style>
   .article-page-title{max-width:1320px;margin:0 auto;padding:0 var(--dw-pad)}.article-breadcrumbs{display:flex;flex-wrap:wrap;gap:12px;padding:18px 0;border-bottom:1px dashed var(--dw-line);color:var(--dw-blue);font:400 12px/1.4 var(--dw-font-mono);letter-spacing:.12em;text-transform:uppercase}.article-breadcrumbs a{color:inherit;text-decoration:none}.article-breadcrumbs span:last-child{color:var(--dw-muted)}.article-title-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.65fr);gap:56px;align-items:end;padding:104px 0 88px}.article-kicker{margin:0 0 20px;color:var(--dw-blue);font:400 12px/1.4 var(--dw-font-mono);letter-spacing:.16em;text-transform:uppercase}.article-title-copy h1{max-width:15ch;margin:0;color:var(--dw-blue);font:600 clamp(40px,5.4vw,76px)/.98 var(--dw-font-display);letter-spacing:-.035em}.article-summary{max-width:54rem;margin:18px 0 0;font-size:20px;line-height:1.5}.article-facts{margin:0}.article-facts>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;padding:9px 0;border-bottom:1px solid var(--dw-line);font-size:14px;line-height:1.4}.article-facts>div:first-child{border-top:1px solid var(--dw-blue)}.article-facts dt{color:var(--dw-muted);font:400 11px/1.5 var(--dw-font-mono);letter-spacing:.1em;text-transform:uppercase}.article-facts dd{margin:0;color:var(--dw-ink)}

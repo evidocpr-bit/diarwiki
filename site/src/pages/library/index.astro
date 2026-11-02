@@ -1,4 +1,5 @@
 ---
+import { serializeJsonLd } from '../../lib/json-ld';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getLibraryResources, libraryCategories } from '../../lib/library';
 import { siteIdentity } from '../../config/site';
@@ -16,7 +17,7 @@ const languageLabel = (value: string) => value.toLocaleLowerCase('ru').split(/[;
 const categoryLabel = (categoryId: string, shortLabel: string) => categoryId === 'education' ? 'Школы и видео' : categoryId === 'communities' ? 'Сообщества' : categoryId === 'quick-reads' ? 'Памятки' : shortLabel;
 ---
 <BaseLayout title="Библиотека — что открывать и зачем" description="Каталог книг, исследований, школ, приложений и пользовательских инструкций с разбором пользы, ограничений и законного способа доступа." canonicalPath="/library/">
-  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+  <script type="application/ld+json" set:html={serializeJsonLd(collectionSchema)} />
   <section style="border-bottom:1px solid var(--b)">
     <div class="dw-container library-hero" style="display:flex;flex-wrap:wrap">
       <div class="catalog-spine"><span>Каталог чтения · {new Date().getFullYear()}</span><span aria-hidden="true">[↓]</span></div>

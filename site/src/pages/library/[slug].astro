@@ -1,4 +1,5 @@
 ---
+import { serializeJsonLd } from '../../lib/json-ld';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatReviewDate, getLibraryResources, type LibraryResource } from '../../lib/library';
 import { siteIdentity } from '../../config/site';
@@ -39,7 +40,7 @@ const schema = {
 ---
 
 <BaseLayout title={resource.title} description={resource.summary} canonicalPath={resource.href}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script type="application/ld+json" set:html={serializeJsonLd(schema)} />
 
   <header class="resource-hero">
     <div class="container resource-hero-grid">

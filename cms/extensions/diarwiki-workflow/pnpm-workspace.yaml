@@ -1,3 +1,9 @@
 allowBuilds:
   esbuild: true
   vue-demi: true
+
+# Patched transitive versions; verify extension builds after changing.
+overrides:
+  vite: 8.1.6
+  zod: 4.6.6
+  joi: 18.3.1

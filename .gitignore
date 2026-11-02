@@ -16,3 +16,21 @@ snapshots/
 runtime/
 playwright-report/
 test-results/
+
+# Credentials, local databases and deployment overrides
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+.npmrc
+.pnpmrc
+*.sqlite*
+*.db
+*.sql
+*.dump
+*.bak
+*.session-journal
+compose.override.yaml
+coverage/

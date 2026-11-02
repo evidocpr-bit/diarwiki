@@ -1,4 +1,5 @@
 ---
+import { serializeJsonLd } from '../../lib/json-ld';
 import Default from '@astrojs/starlight/components/Head.astro';
 import YandexMetrikaHead from '../analytics/YandexMetrikaHead.astro';
 import { siteIdentity } from '../../config/site';
@@ -29,5 +30,5 @@ const previewBuild = import.meta.env.PUBLIC_PREVIEW_BUILD === 'true';
 <Default />
 {previewBuild && <meta name="robots" content="noindex,nofollow" />}
 {previewBuild && <meta name="referrer" content="no-referrer" />}
-<script type="application/ld+json" set:html={JSON.stringify(graph)} />
+<script type="application/ld+json" set:html={serializeJsonLd(graph)} />
 {analyticsEnabled && <YandexMetrikaHead />}
