@@ -1,3 +1,4 @@
+import { decodeEntities, visibleWordCount } from './html-text.mjs';
 import { readFileSync, readdirSync } from 'node:fs';
 
 const dist = new URL('../dist/', import.meta.url);
@@ -14,15 +15,7 @@ const routes = [
 const failures = [];
 const report = [];
 
-function decode(value = '') {
-  return value
-    .replaceAll('&quot;', '"')
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&#39;', "'")
-    .trim();
-}
+const decode = (value = '') => decodeEntities(value).trim();
 
 function getMeta(html, name) {
   for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
@@ -41,14 +34,6 @@ function getCanonical(html) {
   return '';
 }
 
-function visibleWordCount(html) {
-  const text = decode(html
-    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' '));
-  return text.split(/\s+/u).filter(Boolean).length;
-}
 
 const sitemapText = readdirSync(dist)
   .filter((name) => /^sitemap-\d+\.xml$/u.test(name))

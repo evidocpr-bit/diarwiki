@@ -1,3 +1,4 @@
+import { decodeEntities as decodeXml } from './html-text.mjs';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,7 +7,6 @@ const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const origin = 'https://diarwiki.ru';
 const dryRun = process.argv.includes('--dry-run');
 const index = readFileSync(join(dist, 'sitemap-index.xml'), 'utf8');
-const decodeXml = (value) => value.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&apos;', "'");
 const indexLocations = [...index.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((match) => decodeXml(match[1]));
 const sitemapPaths = indexLocations.map((url) => new URL(url).pathname);
 const urls = new Set();
