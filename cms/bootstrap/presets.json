@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "presets": [
+    {
+      "key": "materials-default",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": null,
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "workflow_status", "risk", "responsible_editor", "assigned_reviewer", "updated_at"], "sort": ["-updated_at"], "page": 1 } },
+      "layout_options": { "tabular": { "widths": { "title": 360, "workflow_status": 190, "risk": 130, "responsible_editor": 190, "assigned_reviewer": 190, "updated_at": 180 } } }
+    },
+    {
+      "key": "materials-drafts",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "Черновики",
+      "icon": "draft",
+      "color": "#6E6E6E",
+      "filter": { "workflow_status": { "_eq": "draft" } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "risk", "responsible_editor", "updated_at"], "sort": ["-updated_at"] } }
+    },
+    {
+      "key": "materials-editorial-review",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "На редакционной проверке",
+      "icon": "fact_check",
+      "color": "#315C82",
+      "filter": { "workflow_status": { "_eq": "editorial_review" } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "risk", "responsible_editor", "assigned_reviewer", "updated_at"], "sort": ["updated_at"] } }
+    },
+    {
+      "key": "materials-changes-requested",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "Нужны исправления",
+      "icon": "edit_alert",
+      "color": "#B16A2B",
+      "filter": { "workflow_status": { "_in": ["changes_requested", "revision_required"] } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "workflow_status", "risk", "responsible_editor", "updated_at"], "sort": ["updated_at"] } }
+    },
+    {
+      "key": "materials-medical-review",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "У врача",
+      "icon": "clinical_notes",
+      "color": "#9D4949",
+      "filter": { "workflow_status": { "_eq": "medical_review" } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "risk", "assigned_reviewer", "updated_at"], "sort": ["updated_at"] } }
+    },
+    {
+      "key": "reviewer-assigned-materials",
+      "roles": ["medical_reviewer"],
+      "collection": "materials",
+      "bookmark": "Назначено мне",
+      "icon": "assignment_ind",
+      "color": "#9D4949",
+      "filter": { "assigned_reviewer": { "_eq": "$CURRENT_USER" }, "workflow_status": { "_in": ["medical_review", "revision_required"] } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "workflow_status", "risk", "updated_at"], "sort": ["updated_at"] } }
+    },
+    {
+      "key": "materials-ready",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "Готово к выпуску",
+      "icon": "task_alt",
+      "color": "#2E7253",
+      "filter": { "workflow_status": { "_eq": "ready_to_publish" } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "risk", "medical_review_status", "updated_at"], "sort": ["updated_at"] } }
+    },
+    {
+      "key": "materials-publish-failed",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "Ошибка выпуска",
+      "icon": "error",
+      "color": "#B3261E",
+      "filter": { "workflow_status": { "_eq": "publish_failed" } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "risk", "updated_at"], "sort": ["-updated_at"] } }
+    },
+    {
+      "key": "materials-published",
+      "roles": ["owner", "editor"],
+      "collection": "materials",
+      "bookmark": "Опубликовано",
+      "icon": "public",
+      "color": "#2E7253",
+      "filter": { "workflow_status": { "_eq": "published" } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "risk", "published_at", "public_updated_at"], "sort": ["-published_at"] } }
+    },
+    {
+      "key": "sources-needs-check",
+      "roles": ["owner", "editor"],
+      "collection": "sources",
+      "bookmark": "Проверить ссылки",
+      "icon": "link_off",
+      "color": "#B16A2B",
+      "filter": { "_or": [{ "link_checked_at": { "_null": true } }, { "link_checked_at": { "_lt": "$NOW(-6 months)" } }] },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["title", "author_or_organization", "url", "language", "link_checked_at"], "sort": ["link_checked_at"] } }
+    },
+    {
+      "key": "media-rights-pending",
+      "roles": ["owner", "editor"],
+      "collection": "media_metadata",
+      "bookmark": "Не подтверждены права",
+      "icon": "copyright",
+      "color": "#B16A2B",
+      "filter": { "rights_status": { "_in": ["pending", "restricted"] } },
+      "layout": "cards",
+      "layout_query": { "cards": { "fields": ["file", "alt_text", "author_or_source", "rights_status"], "sort": ["rights_status"] } }
+    },
+    {
+      "key": "release-queue",
+      "roles": ["owner"],
+      "collection": "release_requests",
+      "bookmark": "Очередь выпусков",
+      "icon": "publish",
+      "color": "#B16A2B",
+      "filter": { "status": { "_in": ["queued", "building", "verifying", "failed"] } },
+      "layout": "tabular",
+      "layout_query": { "tabular": { "fields": ["requested_at", "requested_by", "status", "attempt_count", "error_summary"], "sort": ["requested_at"] } }
+    }
+  ]
+}

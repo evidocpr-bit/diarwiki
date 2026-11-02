@@ -1,0 +1,39 @@
+---
+import { mainNavigation, routePaths, siteIdentity } from '../config/site';
+import Icon from './Icon.astro';
+const path = Astro.url.pathname;
+const navigation = mainNavigation.filter((item) => item.key !== 'urgent');
+// /urgent/ exists as a utility page but is not an authored, doctor-reviewed article.
+// The guide explicitly withholds the emergency CTA until that review exists.
+const urgentReviewed = false;
+---
+<div class="service-strip" id="top">
+  <div class="dw-container service-strip-inner">
+    <span class="topbar-1">Просветительский справочник · диабет 1 типа</span>
+    <span class="topbar-2">Не заменяет врача · При угрозе жизни — <a href="tel:112">112</a></span>
+  </div>
+</div>
+<header class="site-header">
+  <div class="dw-container header-inner">
+    <a class="brand" href={routePaths.home}>
+      <span class="brand-mark" aria-hidden="true">Д</span><span class="brand-name">{siteIdentity.name}</span>
+    </a>
+    <nav class="nav-desktop" aria-label="Основная навигация">
+      {navigation.map((link) => <a href={link.href} aria-current={path === link.href || (link.href !== '/' && path.startsWith(link.href)) ? 'page' : undefined}>{link.label}</a>)}
+    </nav>
+    <div class="header-actions">
+      <a class="search-btn icon-host" href={routePaths.search} aria-label="Открыть поиск по сайту"><Icon name="search" size={20} /></a>
+      {urgentReviewed && <a class="urgent-link" href={routePaths.urgent}><span class="urgent-dot" aria-hidden="true"></span>Срочно</a>}
+      <details class="mobile-menu">
+        <summary class="burger icon-host" aria-label="Открыть меню"><Icon name="menu" size={20} /></summary>
+        <nav aria-label="Мобильная навигация">{navigation.map((link) => <a href={link.href} aria-current={path === link.href ? 'page' : undefined}>{link.label}<span aria-hidden="true">↗</span></a>)}</nav>
+      </details>
+    </div>
+  </div>
+</header>
+<style>
+  .service-strip{background:var(--dw-blue-deep);color:var(--dw-white);font:500 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.service-strip-inner{min-height:32px;display:flex;align-items:center;justify-content:space-between;gap:24px}.service-strip a{color:inherit}
+  .site-header{position:relative;z-index:20;background:var(--dw-paper);border-bottom:1px solid var(--dw-blue)}.header-inner{min-height:84px;display:flex;align-items:center;gap:36px}.brand{display:inline-flex;align-items:center;gap:12px;flex:none;color:var(--dw-blue);text-decoration:none}.brand-mark{width:38px;height:38px;display:grid;place-items:center;background:var(--dw-blue);color:var(--dw-white);font:700 21px/1 var(--dw-font-display)}.brand-name{font:700 23px/1 var(--dw-font-display);letter-spacing:-.02em}
+  .nav-desktop{display:flex;align-items:center;flex-wrap:wrap;gap:4px 36px;margin-left:4px}.nav-desktop a{padding:10px 0;border-bottom:2px solid transparent;color:var(--dw-blue);font:400 13px/1.2 var(--dw-font-mono);letter-spacing:.1em;text-transform:uppercase;text-decoration:none}.nav-desktop a:hover,.nav-desktop a[aria-current="page"]{border-color:var(--dw-blue)}.header-actions{display:flex;align-items:center;gap:10px;margin-left:auto}.search-btn,.burger{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--dw-blue);background:transparent;color:var(--dw-blue);text-decoration:none;cursor:pointer}.mobile-menu{position:relative}.mobile-menu>summary{list-style:none}.mobile-menu>summary::-webkit-details-marker{display:none}.mobile-menu nav{position:absolute;right:0;top:calc(100% + 8px);width:min(320px,calc(100vw - 40px));padding:0 16px;border:1px solid var(--dw-blue);background:var(--dw-paper)}.mobile-menu nav a{min-height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed var(--dw-blue);color:var(--dw-blue);font:400 13px/1.3 var(--dw-font-mono);letter-spacing:.08em;text-decoration:none;text-transform:uppercase}.mobile-menu nav a:last-child{border-bottom:0}.urgent-link{height:44px;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--dw-signal);color:var(--dw-signal-ink);font:700 12px/1 var(--dw-font-mono);letter-spacing:.12em;text-decoration:none;text-transform:uppercase}.urgent-dot{width:8px;height:8px;border-radius:50%;background:var(--dw-signal-ink)}.burger{display:none}
+  @media(max-width:760px){.service-strip{display:none}.header-inner{min-height:64px;gap:12px}.brand-name{font-size:20px}.nav-desktop{display:none}.search-btn{display:none}.burger{display:grid}.header-actions{gap:8px}}
+</style>

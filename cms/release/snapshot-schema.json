@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diarwiki.ru/schemas/cms-snapshot-v1.json",
+  "title": "DiarWiki immutable release snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "snapshot_id", "snapshot_sha256", "source_commit", "content", "manifest"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "snapshot_id": { "type": "string", "pattern": "^dw-[a-f0-9]{20}$" },
+    "snapshot_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "source_commit": { "type": "string", "minLength": 7 },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["materials", "sources", "library_items", "pages", "navigation", "site_settings", "media_manifest", "redirects"],
+      "properties": {
+        "materials": { "type": "array", "items": { "type": "object" } },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "library_items": { "type": "array", "items": { "type": "object" } },
+        "pages": { "type": "array", "items": { "type": "object" } },
+        "navigation": { "type": "array", "items": { "type": "object" } },
+        "site_settings": { "type": "object" },
+        "media_manifest": { "type": "array", "items": { "type": "object", "required": ["sha256"] } },
+        "redirects": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["counts", "routes"],
+      "properties": {
+        "counts": { "type": "object" },
+        "routes": { "type": "array", "items": { "type": "string", "pattern": "^/" }, "uniqueItems": true }
+      }
+    }
+  }
+}

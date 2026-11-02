@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Страница не найдена"
+  description="Такой страницы в «ДиарВики» нет. Вернитесь на главную или откройте базу знаний."
+  canonicalPath="/404/"
+  indexable={false}
+>
+  <section class="not-found">
+    <div class="container reading">
+      <p class="eyebrow">Ошибка 404</p>
+      <h1>Страница не найдена</h1>
+      <p class="lead">Возможно, адрес изменился или материал ещё не опубликован.</p>
+      <div class="actions">
+        <a class="button primary" href="/">На главную</a>
+        <a class="button secondary" href="/knowledge/">Открыть базу знаний</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    min-height: 65vh;
+    place-items: center;
+    padding: 4rem 0 6rem;
+    background: var(--paper);
+    text-align: center;
+  }
+
+  .reading { width: min(calc(100% - 2rem), 46rem); }
+
+  h1 {
+    margin: 0;
+    color: var(--blue);
+    font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display);
+    letter-spacing: -.035em;
+  }
+
+  .lead {
+    max-width: 34rem;
+    margin: 1.25rem auto 0;
+    color: var(--muted);
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .75rem;
+    margin-top: 2rem;
+  }
+
+  .button.primary { background: var(--blue); color: var(--white); }
+  .button.secondary { border: 1px solid var(--blue); background: transparent; color: var(--blue); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button:hover { transform: none; }
+  }
+</style>

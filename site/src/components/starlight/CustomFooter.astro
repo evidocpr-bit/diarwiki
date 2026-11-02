@@ -1,0 +1,12 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+import SiteFooter from '../SiteFooter.astro';
+import YandexMetrikaNoScript from '../analytics/YandexMetrikaNoScript.astro';
+const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED !== 'false';
+---
+{analyticsEnabled && <YandexMetrikaNoScript />}
+<Default />
+<div class="article-footer"><SiteFooter /></div>
+<style>
+  .article-footer{width:100%;min-width:0;margin:0}
+</style>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" role="img" aria-labelledby="title desc">
+  <title id="title">Экран приложения с показанием, стрелкой и графиком</title>
+  <desc id="desc">Телефон показывает текущее значение глюкозы, горизонтальную стрелку направления и плавный график за несколько часов.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eefcfc"/><stop offset="1" stop-color="#d6f4f6"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-20%" width="160%" height="160%"><feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#0b607f" flood-opacity=".18"/></filter>
+  </defs>
+  <rect width="900" height="640" rx="42" fill="url(#bg)"/>
+  <path d="M85 153c98-105 173-99 256-57" fill="none" stroke="#4bc4d2" stroke-width="12" stroke-linecap="round" opacity=".18"/>
+  <circle cx="765" cy="121" r="56" fill="#ffd86f" opacity=".52"/>
+  <g filter="url(#shadow)">
+    <rect x="267" y="61" width="366" height="522" rx="56" fill="#17383d"/>
+    <rect x="286" y="83" width="328" height="478" rx="42" fill="#fff"/>
+    <rect x="394" y="73" width="112" height="18" rx="9" fill="#17383d"/>
+  </g>
+  <text x="328" y="154" fill="#5c6e73" font-family="Arial, sans-serif" font-size="22">Сейчас</text>
+  <text x="328" y="244" fill="#117692" font-family="Arial, sans-serif" font-size="88" font-weight="700">6,8</text>
+  <text x="508" y="226" fill="#5c6e73" font-family="Arial, sans-serif" font-size="22">ммоль/л</text>
+  <path d="M515 256h64m0 0-20-18m20 18-20 18" fill="none" stroke="#4bc4d2" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="322" y="310" width="258" height="174" rx="22" fill="#effafa"/>
+  <path d="M344 448c34-11 53-42 81-38 30 4 35 30 68 14 31-15 39-78 69-63" fill="none" stroke="#117692" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#4bc4d2">
+    <circle cx="344" cy="448" r="8"/><circle cx="425" cy="410" r="8"/><circle cx="493" cy="424" r="8"/><circle cx="562" cy="361" r="8"/>
+  </g>
+  <path d="M344 387h218M344 428h218" stroke="#bfe7ea" stroke-width="3" stroke-dasharray="7 10"/>
+  <circle cx="170" cy="439" r="45" fill="#fff" opacity=".75"/>
+  <path d="M143 440h54m0 0-18-16m18 16-18 16" fill="none" stroke="#117692" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#4bc4d2" opacity=".45"><circle cx="734" cy="412" r="13"/><circle cx="774" cy="450" r="8"/><circle cx="717" cy="478" r="20"/></g>
+</svg>

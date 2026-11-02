@@ -1,0 +1,36 @@
+---
+interface Props { items: string[]; }
+const { items } = Astro.props;
+---
+
+<aside class="learn-list" aria-labelledby="learn-list-title">
+  <div class="learn-list__icon" aria-hidden="true">i</div>
+  <div>
+    <p class="learn-list__eyebrow">В этой статье</p>
+    <h2 id="learn-list-title">Что вы узнаете</h2>
+    <ul>
+      {items.map((item) => <li>{item}</li>)}
+    </ul>
+  </div>
+</aside>
+
+<style>
+  .learn-list { display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 0; margin: 0; border: 1px solid var(--dw-blue); background: transparent; }
+  .learn-list__icon {
+    display: grid;
+    place-items: center;
+    border-right: 1px solid var(--dw-blue);
+    color: var(--dw-blue);
+    font: 400 20px/1 var(--dw-font-mono);
+  }
+  .learn-list > div { padding: 16px 20px; }
+  .learn-list__eyebrow { margin: 0 0 4px; color: var(--dw-blue); font: 400 11px/1.4 var(--dw-font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .learn-list h2 {
+    margin: 0 0 8px !important;
+    color: var(--dw-blue);
+    font: 600 22px/1.15 var(--dw-font-display) !important;
+  }
+  .learn-list ul { margin: 0; padding-inline-start: 20px; }
+  .learn-list li + li { margin-top: 4px; }
+  @media(max-width:520px){.learn-list{grid-template-columns:42px minmax(0,1fr)}.learn-list>div{padding:14px}.learn-list h2{font-size:20px!important}}
+</style>

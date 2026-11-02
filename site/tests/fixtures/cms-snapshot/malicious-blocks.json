@@ -1,0 +1,19 @@
+[
+  {
+    "id": "safe-rich-text",
+    "sort_order": 1,
+    "block_type": "rich_text",
+    "item": {
+      "content": "<p onclick=\"alert(1)\">Полезный текст <a href=\"javascript:alert(1)\">ссылка</a>.</p><script>alert(1)</script>"
+    }
+  },
+  {
+    "id": "safe-contact",
+    "sort_order": 2,
+    "block_type": "contact_prompt",
+    "item": {
+      "label": "Сообщить о неточности",
+      "href": "/contact/"
+    }
+  }
+]

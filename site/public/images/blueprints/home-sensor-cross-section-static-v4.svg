@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+<title>Сенсор глюкозы — упрощённый чертёж в разрезе</title>
+<desc>Минималистичный векторный чертёж накожного сенсора с тонким филаментом, находящимся под кожей. Белые линии на синем фоне.</desc>
+<defs>
+ <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#FFFFFF" stroke-opacity=".075" stroke-width="1"/></pattern>
+ <pattern id="minor" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="#FFFFFF" stroke-opacity=".028" stroke-width=".7"/></pattern>
+ <style> .line{fill:none;stroke:#F7FBFF;stroke-width:3;stroke-linecap:round;stroke-linejoin:round} .fine{fill:none;stroke:#F7FBFF;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round} .thin{fill:none;stroke:#F7FBFF;stroke-opacity:.5;stroke-width:1.3} .txt{fill:#F7FBFF;font-family:Arial,'DejaVu Sans',sans-serif} .ttl{font-size:32px;font-weight:700;letter-spacing:2px} .label{font-size:22px;font-weight:600;letter-spacing:.7px} .sm{font-size:18px} </style>
+</defs>
+<!-- Blueprint: фон и заливки сенсора используют #1D45D8. -->
+<rect width="1440" height="900" fill="#1D45D8"/>
+<rect width="1440" height="900" fill="url(#minor)"/>
+<rect width="1440" height="900" fill="url(#grid)"/>
+<rect x="28" y="28" width="1384" height="844" class="fine" opacity=".75"/>
+<text x="76" y="92" class="txt ttl">СЕНСОР ГЛЮКОЗЫ</text>
+<text x="76" y="127" class="txt sm" opacity=".82">СХЕМАТИЧЕСКИЙ РАЗРЕЗ • НЕ В МАСШТАБЕ</text>
+<!-- epidermis dermis and fat -->
+<path d="M100 425 C285 418 495 432 710 423 S1085 430 1340 424" class="line draw" pathLength="1"/>
+<path d="M100 447 C350 441 540 451 710 444 S1110 447 1340 444" class="fine draw" pathLength="1"/>
+<path d="M100 617 C340 607 510 625 720 617 S1090 626 1340 616" class="fine" stroke-dasharray="14 10" opacity=".8"/>
+<!-- reduced fat ovals -->
+<g class="fine" opacity=".52">
+<ellipse cx="470" cy="695" rx="45" ry="31"/><ellipse cx="568" cy="695" rx="45" ry="31"/><ellipse cx="666" cy="695" rx="45" ry="31"/><ellipse cx="764" cy="695" rx="45" ry="31"/><ellipse cx="862" cy="695" rx="45" ry="31"/><ellipse cx="960" cy="695" rx="45" ry="31"/>
+<ellipse cx="515" cy="759" rx="45" ry="31"/><ellipse cx="613" cy="759" rx="45" ry="31"/><ellipse cx="711" cy="759" rx="45" ry="31"/><ellipse cx="809" cy="759" rx="45" ry="31"/><ellipse cx="907" cy="759" rx="45" ry="31"/>
+</g>
+<!-- adhesive patch -->
+<path d="M455 412 C530 396 890 396 965 412 L985 423 C897 432 519 432 435 423 Z" class="draw draw-body" pathLength="1" fill="#1D45D8" stroke="#F7FBFF" stroke-width="2.7"/>
+<!-- device body -->
+<path d="M520 405 L520 347 Q520 300 573 289 Q710 262 849 289 Q900 300 900 347 L900 405 Q710 426 520 405 Z" class="draw draw-body" pathLength="1" fill="#1D45D8" stroke="#F7FBFF" stroke-width="3"/>
+<ellipse cx="710" cy="318" rx="188" ry="42" class="draw draw-body" pathLength="1" fill="#1D45D8" stroke="#F7FBFF" stroke-width="3"/>
+<ellipse cx="710" cy="318" rx="32" ry="10" class="fine"/>
+<path d="M545 389 Q710 407 875 389" class="fine" opacity=".55"/>
+<!-- filament -->
+<path d="M710 421 L710 675" class="draw draw-filament" pathLength="1" stroke="#F7FBFF" stroke-width="8" stroke-linecap="round"/>
+<path d="M710 423 L710 671" class="draw draw-filament" pathLength="1" stroke="#1D45D8" stroke-width="3" stroke-linecap="round"/>
+<path d="M703 671 L710 692 L717 671" fill="#1D45D8" stroke="#F7FBFF" stroke-width="2.6" stroke-linejoin="round"/>
+<!-- annotations -->
+<g class="annotations">
+<g class="fine"><path d="M595 298 L430 235 H294"/><circle cx="595" cy="298" r="5" fill="#F7FBFF" stroke="none"/><path d="M932 417 L1045 342 H1080"/><circle cx="932" cy="417" r="5" fill="#F7FBFF" stroke="none"/><path d="M710 563 L1000 555 H1078"/><circle cx="710" cy="563" r="5" fill="#F7FBFF" stroke="none"/><path d="M192 437 L285 502 H350"/><circle cx="192" cy="437" r="5" fill="#F7FBFF" stroke="none"/><path d="M270 565 H370"/><circle cx="370" cy="565" r="5" fill="#F7FBFF" stroke="none"/></g>
+<text x="130" y="208" class="txt label">КОРПУС ДАТЧИКА</text>
+<text x="1085" y="319" class="txt label">КЛЕЕВАЯ</text><text x="1085" y="347" class="txt label">ОСНОВА</text>
+<text x="1085" y="535" class="txt label">ГИБКИЙ УСИК</text><text x="1085" y="562" class="txt sm">(ФИЛАМЕНТ)</text>
+<text x="110" y="520" class="txt label">ЭПИДЕРМИС</text>
+<text x="114" y="590" class="txt label">ДЕРМА</text>
+<text x="140" y="797" class="txt label">ПОДКОЖНАЯ</text><text x="140" y="825" class="txt label">КЛЕТЧАТКА</text>
+<!-- right bottom explanatory caption -->
+<text x="1050" y="774" class="txt sm">УСИК ИЗМЕРЯЕТ ГЛЮКОЗУ</text>
+<text x="1050" y="802" class="txt sm">В МЕЖКЛЕТОЧНОЙ ЖИДКОСТИ</text>
+</g>
+</svg>

@@ -1,0 +1,8 @@
+# Не используется автоматически. Скопируйте в compose.override.yaml только
+# для локальной диагностики и не добавляйте рабочие секреты в этот файл.
+services:
+  directus:
+    environment:
+      LOG_LEVEL: debug
+      LOG_STYLE: pretty
+

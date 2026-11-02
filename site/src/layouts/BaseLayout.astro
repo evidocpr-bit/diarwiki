@@ -1,0 +1,57 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import YandexMetrikaHead from '../components/analytics/YandexMetrikaHead.astro';
+import YandexMetrikaNoScript from '../components/analytics/YandexMetrikaNoScript.astro';
+import { siteIdentity } from '../config/site';
+import '@fontsource-variable/inter-tight';
+import '@fontsource-variable/golos-text';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  indexable?: boolean;
+}
+
+const { title, description, canonicalPath = Astro.url.pathname, indexable: pageIndexable } = Astro.props;
+const canonicalPathWithoutQuery = canonicalPath.split(/[?#]/, 1)[0] || '/';
+const canonical = new URL(canonicalPathWithoutQuery, siteIdentity.origin);
+const indexable = pageIndexable ?? import.meta.env.PUBLIC_SITE_INDEXABLE === 'true';
+const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED !== 'false';
+const previewBuild = import.meta.env.PUBLIC_PREVIEW_BUILD === 'true';
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#1d45d8" />
+    <meta name="robots" content={indexable ? 'index,follow' : 'noindex,nofollow'} />
+    {previewBuild && <meta name="referrer" content="no-referrer" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content={siteIdentity.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <title>{title} | {siteIdentity.name}</title>
+    {analyticsEnabled && <YandexMetrikaHead />}
+  </head>
+  <body>
+    {analyticsEnabled && <YandexMetrikaNoScript />}
+    <a class="skip-link" href="#main">Перейти к содержанию</a>
+    <SiteHeader />
+    <main id="main" data-pagefind-body>
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

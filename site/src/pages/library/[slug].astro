@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatReviewDate, getLibraryResources, type LibraryResource } from '../../lib/library';
+import { siteIdentity } from '../../config/site';
+
+export function getStaticPaths() {
+  return getLibraryResources().map((resource) => ({
+    params: { slug: resource.slug },
+    props: { resource },
+  }));
+}
+
+interface Props { resource: LibraryResource }
+const { resource } = Astro.props;
+
+const sourceLinks = [
+  ...resource.telegramAlternatives,
+  resource.authorsUrl && { label: 'Автор или организация', url: resource.authorsUrl },
+  resource.collectionUrl && !/^https:\/\/t\.me\//u.test(resource.collectionUrl) && { label: 'Коллекция или сообщество', url: resource.collectionUrl },
+]
+  .filter((item): item is { label: string; url: string } => Boolean(item))
+  .filter((item, index, items) => items.findIndex((candidate) => candidate.url === item.url) === index && item.url !== resource.accessUrl);
+
+const isBook = resource.category.id === 'books';
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': isBook ? 'Book' : 'CreativeWork',
+  '@id': `${siteIdentity.origin}${resource.href}#resource`,
+  url: `${siteIdentity.origin}${resource.href}`,
+  name: resource.title,
+  description: resource.summary,
+  inLanguage: resource.language,
+  datePublished: /^\d{4}$/u.test(resource.year) ? resource.year : undefined,
+  author: resource.authors ? { '@type': 'Person', name: resource.authors } : undefined,
+  publisher: resource.publisher ? { '@type': 'Organization', name: resource.publisher } : undefined,
+  isPartOf: { '@id': `${siteIdentity.origin}/library/#collection` },
+  sameAs: resource.accessUrl || undefined,
+};
+---
+
+<BaseLayout title={resource.title} description={resource.summary} canonicalPath={resource.href}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <header class="resource-hero">
+    <div class="container resource-hero-grid">
+      <div>
+        <a class="back-link" href={`/library/#${resource.category.id}`}>← {resource.category.label}</a>
+        <p class="eyebrow">{resource.resourceType}</p>
+        <h1>{resource.title}</h1>
+        <p class="resource-lead">{resource.summary}</p>
+      </div>
+      <dl class="resource-facts">
+        {resource.authors && <div><dt>Автор или организация</dt><dd>{resource.authors}</dd></div>}
+        {resource.year && <div><dt>Год</dt><dd>{resource.year}</dd></div>}
+        {resource.language && <div><dt>Язык</dt><dd>{resource.language}</dd></div>}
+        {resource.format && <div><dt>Формат</dt><dd>{resource.format}</dd></div>}
+        <div><dt>Проверено редакцией</dt><dd>{formatReviewDate(resource.lastReviewed)}</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <main class="resource-main container">
+    <article class="resource-content">
+      <section aria-labelledby="benefit-title">
+        <p class="section-kicker">Главное</p>
+        <h2 id="benefit-title">Чем полезен этот ресурс</h2>
+        <p>{resource.benefit}</p>
+      </section>
+
+      <section class="caution" aria-labelledby="caution-title">
+        <p class="section-kicker">Перед использованием</p>
+        <h2 id="caution-title">Что важно учесть</h2>
+        <p>{resource.caution}</p>
+      </section>
+
+      <section aria-labelledby="review-title">
+        <p class="section-kicker">Статус</p>
+        <h2 id="review-title">Что уже проверено</h2>
+        <p>{resource.status}</p>
+        <h3>Медицинская оговорка</h3>
+        <p>{resource.medicalReview}</p>
+      </section>
+
+      <section aria-labelledby="how-to-use-title">
+        <p class="section-kicker">Практика</p>
+        <h2 id="how-to-use-title">Как работать с материалом</h2>
+        <ol class="use-steps">
+          <li><span>1</span><p>Сначала прочитайте ограничения выше: они помогают отделить полезное объяснение от устаревшей схемы или непроверенного пользовательского совета.</p></li>
+          <li><span>2</span><p>Откройте исходный ресурс и проверьте дату, модель устройства или издание книги. Для приложений особенно важна совместимость конкретной версии.</p></li>
+          <li><span>3</span><p>Не меняйте лечение только по книге, видео или сообщению из сообщества. Дозировки и медицинские решения обсуждаются с лечащим врачом.</p></li>
+        </ol>
+      </section>
+
+      <details class="rights-details">
+        <summary>Доступ и авторские права</summary>
+        <p>{resource.rights}</p>
+      </details>
+    </article>
+
+    <aside class="access-panel" aria-label="Ссылки на ресурс">
+      <p class="section-kicker">Перейти к материалу</p>
+      {resource.accessUrl ? (
+        <a class="button access-button" data-testid="resource-access" href={resource.accessUrl} target="_blank" rel="external noreferrer">{resource.accessLabel} ↗</a>
+      ) : (
+        <p data-testid="resource-access">Открытая ссылка на материал пока не найдена.</p>
+      )}
+      {sourceLinks.length > 0 && (
+        <div class="secondary-links">
+          {sourceLinks.map((link) => <a href={link.url} target="_blank" rel="external noreferrer">{link.label} ↗</a>)}
+        </div>
+      )}
+      <div class="topic-list">
+        <strong>Темы</strong>
+        <div>{resource.topics.map((topic) => <span>{topic}</span>)}</div>
+      </div>
+      <p class="access-note">Ссылка ведёт на сайт автора, издателя, магазин приложений или исходную публикацию. «ДиарВики» не хранит копию файла.</p>
+    </aside>
+  </main>
+
+  <section class="next-step">
+    <div class="container next-step-inner">
+      <div>
+        <p class="eyebrow">Продолжить</p>
+        <h2>Посмотрите другие материалы этого типа</h2>
+      </div>
+      <a class="button button--secondary" href={`/library/#${resource.category.id}`}>Вернуться в раздел «{resource.category.shortLabel}»</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .resource-hero { padding: 0 0 48px; background: var(--paper); border-bottom: 1px solid var(--blue); }
+  .resource-hero-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(18rem, .65fr); gap: clamp(2rem, 7vw, 6rem); align-items: end; }
+  .back-link { display: inline-flex; margin: 28px 0 42px; color: var(--blue); font: 400 12px/1.4 var(--font-mono); letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
+  .resource-hero .eyebrow { color: var(--blue); font: 400 12px/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .resource-hero h1 { max-width: 18ch; margin: 0; color: var(--blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display); letter-spacing: -.035em; overflow-wrap: anywhere; }
+  .resource-lead { max-width: 40rem; margin: 18px 0 0; color: var(--ink); font-size: 20px; line-height: 1.5; }
+  .resource-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); margin: 0; border-top: 1px solid var(--blue); font-size: 14px; }
+  .resource-facts div { display: contents; }
+  .resource-facts dt, .resource-facts dd { margin: 0; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .resource-facts dt { color: var(--muted); font: 400 11px/1.5 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+  .resource-facts dd { color: var(--ink); font: 400 13px/1.5 var(--font-mono); overflow-wrap: anywhere; }
+  .resource-main { display: grid; grid-template-columns: minmax(0, 760px); justify-content: center; gap: 48px; padding-block: 72px 100px; align-items: start; }
+  .resource-content { width: 100%; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; font-size: 18px; line-height: 1.65; }
+  .resource-content section + section { margin-top: 0; padding-top: 32px; border-top: 1px solid var(--line); }
+  .section-kicker { margin: 0 0 10px; color: var(--blue); font: 400 11px/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .resource-content h2 { margin: 0 0 14px; color: var(--blue); font: 600 clamp(26px, 3vw, 34px)/1.08 var(--font-display); letter-spacing: -.025em; }
+  .resource-content h3 { margin: 1.6rem 0 .45rem; color: var(--ink); }
+  .resource-content p { font-size: 18px; }
+  .caution { padding: 24px 0; border-block: 1px solid var(--blue); background: transparent; }
+  .use-steps { margin: 1.3rem 0 0; padding: 0; list-style: none; }
+  .use-steps li { display: grid; grid-template-columns: 2.6rem 1fr; gap: .9rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+  .use-steps span { color: var(--blue); font: 400 18px/1.4 var(--font-mono); }
+  .use-steps p { margin: 0; }
+  .rights-details { margin-top: 0; padding: 1rem 0; border-block: 1px solid var(--line); background: transparent; }
+  .rights-details summary { cursor: pointer; color: var(--ink); font-weight: 700; }
+  .rights-details p { margin-bottom: 0; color: var(--ink-muted); font-size: .92rem; }
+  .access-panel { position: static; width: 100%; max-width: 760px; margin: 0 auto; padding: 22px 0; border-block: 1px solid var(--blue); background: transparent; }
+  .access-button { width: max-content; max-width: 100%; text-align: center; }
+  .secondary-links { display: grid; gap: .6rem; margin-top: 1rem; }
+  .secondary-links a { padding: .7rem 0; border-bottom: 1px dashed var(--blue); color: var(--blue); font: 400 14px/1.45 var(--font-mono); }
+  .topic-list { margin-top: 1.4rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+  .topic-list > strong { display: block; margin-bottom: .6rem; font-size: .82rem; }
+  .topic-list div { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .topic-list span { padding: .25rem .55rem; border: 1px solid var(--line); color: var(--muted); font: 400 11px/1.4 var(--font-mono); }
+  .access-note { margin: 1.3rem 0 0; color: var(--muted); font: 400 11px/1.55 var(--font-mono); }
+  .next-step { padding: 3rem 0; border-top: 1px solid var(--blue); background: var(--paper); }
+  .next-step-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+  .next-step h2 { margin: 0; color: var(--blue); font: 600 clamp(26px, 3vw, 34px)/1.08 var(--font-display); }
+  @media (max-width: 54rem) {
+    .resource-hero-grid, .resource-main { grid-template-columns: 1fr; }
+    .resource-facts { max-width: none; }
+  }
+  @media (max-width: 40rem) {
+    .resource-hero h1 { font-size: clamp(40px, 12vw, 56px); }
+    .next-step-inner { align-items: stretch; flex-direction: column; }
+    .resource-main { padding-block: 48px 72px; }
+    .resource-content { gap: 40px; font-size: 17px; }
+  }
+</style>

@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+interface Props { sources?: Array<{ title: string; organization: string; href: string; note: string }>; }
+const { sources: fallbackSources = [] } = Astro.props;
+const docs = await getCollection('docs');
+const allSources = await getCollection('sources');
+const currentPath = Astro.url.pathname;
+const currentEntry = docs.find((entry) => `/${entry.id.replace(/\/index$/u, '')}/`.replace(/\/+/gu, '/') === currentPath);
+const sourceById = new Map(allSources.map((source) => [source.data.id, source.data]));
+const sources = currentEntry?.data.sourceIds.map((id) => {
+  const source = sourceById.get(id);
+  return source ? { title: source.title, organization: source.organization, href: source.url, note: source.note ?? '' , language: source.language } : null;
+}).filter((source) => source !== null) ?? fallbackSources.map((source) => ({ ...source, language: 'ru' }));
+const isReviewed = currentEntry?.data.medicalReview === 'reviewed';
+const languageLabel = (value: string) => value === 'en' ? 'EN' : 'RU';
+---
+<section class="article-sources" aria-labelledby="article-sources-title">
+  <div class="article-sources__heading"><h2 id="article-sources-title">Источники</h2><span>{sources.length} позиций</span></div>
+  <ol>
+    {sources.map((source, index) => <li><a class="row-link" href={source.href} target="_blank" rel="external noreferrer"><span>[{index + 1}]</span><span><strong>{source.title}</strong><small>{source.organization} · {languageLabel(source.language)} · {source.note}</small></span><span aria-hidden="true">↗</span></a></li>)}
+  </ol>
+  {!isReviewed && <p class="article-sources__review-note">Врачебная проверка этой версии материала пока не проводилась.</p>}
+</section>
+<style>
+  .article-sources{margin:0}.article-sources__heading{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:18px 0 8px;border-top:1px solid var(--dw-blue)}.article-sources__heading h2{margin:0!important;color:var(--dw-blue);font:600 28px/1.2 var(--dw-font-display);letter-spacing:-.02em}.article-sources__heading>span{color:var(--dw-muted);font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.article-sources ol{margin:0;padding:0;list-style:none}.article-sources li{margin:0!important}.article-sources li>a{display:grid;grid-template-columns:44px minmax(0,1fr) 24px;gap:12px;padding:16px 0;border-bottom:1px dashed var(--dw-blue);color:var(--dw-ink);text-decoration:none}.article-sources li>a>span:first-child,.article-sources li>a>span:last-child{color:var(--dw-blue);font-family:var(--dw-font-mono)}.article-sources li>a>span:nth-child(2){display:flex;flex-direction:column;gap:2px}.article-sources strong{font-weight:600}.article-sources small{color:var(--dw-muted);font:400 11px/1.5 var(--dw-font-mono);letter-spacing:.06em;text-transform:uppercase}.article-sources__review-note{margin:14px 0 0;color:var(--dw-muted);font-size:14px}
+</style>

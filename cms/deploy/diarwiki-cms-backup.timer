@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily DiarWiki CMS backup
+
+[Timer]
+OnCalendar=*-*-* 02:20:00 UTC
+RandomizedDelaySec=20min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const steps = [
+  ['Понять, что изменилось', 'Начните с общего объяснения диагноза и запишите непонятные слова. Не пытайтесь освоить всё за один день.', '/knowledge/what-is-diabetes/'],
+  ['Найти личный план', 'Соберите в одном месте назначения, контакты медицинской команды и согласованные действия для нестандартных ситуаций.', '/knowledge/after-diagnosis/'],
+  ['Подготовить вопросы', 'На приёме проще получить ответ, если заранее записать ситуации, термины и работу устройств, которые вызывают вопросы.', '/knowledge/prepare-for-appointment/'],
+  ['Освоить глюкометр', 'Выберите систему по доступности полосок, отработайте одно измерение и запишите, как проверять неожиданный результат.', '/knowledge/glucometer-basics/'],
+  ['Разобраться в инсулине', 'Запомните роль, МНН, торговое название, концентрацию и устройство каждого своего препарата.', '/knowledge/insulin-types/'],
+  ['Проверять источники', 'Уточняйте дату, аудиторию, страну и то, относится ли материал к вашей ситуации и конкретному устройству.', '/knowledge/how-to-read-sources/'],
+];
+const learningResources = [
+  {
+    marker: 'Курс',
+    title: 'ТЕРАПЕВТУМ — школа диабета',
+    text: 'Бесплатный курс ГЕРОФАРМ и Российской диабетической ассоциации. Подходит как спокойный следующий шаг после знакомства с базовыми терминами.',
+    href: '/library/terapevtum/',
+  },
+  {
+    marker: 'Книга',
+    title: '«Сахарный человек»',
+    text: 'Понятное введение в жизнь с диабетом 1 типа. Удобно читать по главам, а спорные или устаревшие рекомендации сверять с врачом.',
+    href: '/library/saharnyi-chelovek/',
+  },
+  {
+    marker: 'Книга',
+    title: 'Рагнар Ханас: диабет 1 типа',
+    text: 'Большой справочник для семей, подростков и взрослых. Хорош как настольная книга, но русское издание датировано 2011 годом.',
+    href: '/library/diabet-1-tipa-u-detei-podrostkov-i-molodyh-ludei/',
+  },
+  {
+    marker: 'Опыт',
+    title: 'Пособие Елены Прошуниной',
+    text: 'Пациентский взгляд на первые месяцы после диагноза. Это поддержка и опыт другого человека, а не медицинское руководство.',
+    href: '/library/posobie-dlya-novichkov-s-saharnym-diabetom-1-tipa/',
+  },
+  {
+    marker: 'Видео',
+    title: 'Школы диабета в записи',
+    text: 'Большая подборка занятий разных авторов. Начинайте с общей школы, а инструкции по лечению и устройствам проверяйте по дате и модели.',
+    href: '/library/vk-shkola-diabeta-video/',
+  },
+  {
+    marker: 'Помпы',
+    title: 'Архив вебинаров Medtronic',
+    text: 'Знакомит с терминами помповой терапии и инфузионными наборами. Записи 2019–2021 годов не заменяют руководство к современной помпе.',
+    href: '/library/medtronic-webinars-drive/',
+  },
+];
+---
+<BaseLayout title="С чего начать" description="Спокойный маршрут первых шагов после диагноза: понять изменения, собрать личный план, подготовиться к врачу, освоить глюкометр и названия инсулина.">
+  <section class="start-hero">
+    <div class="container narrow">
+      <p class="eyebrow">Первые шаги</p>
+      <h1>Необязательно разобраться во всём сразу</h1>
+      <p>Этот маршрут помогает упорядочить информацию перед следующей консультацией. Он не заменяет обучение в медицинской организации и ваш личный план лечения.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container narrow">
+      <ol class="steps">
+        {steps.map(([title, text, href], index) => (
+          <li>
+            <span class="step-number">{index + 1}</span>
+            <div><h2>{title}</h2><p>{text}</p><a href={href}>Прочитать материал →</a></div>
+          </li>
+        ))}
+      </ol>
+      <aside class="safety-note">
+        <strong>Если ситуация срочная</strong>
+        <p>Не ждите ответа на сайте. При потере сознания, судорогах, выраженной одышке, спутанности сознания или другой угрозе жизни звоните 112.</p>
+      </aside>
+    </div>
+  </section>
+  <section class="section learning-section" aria-labelledby="learning-title">
+    <div class="container narrow">
+      <div class="section-heading">
+        <p class="eyebrow">Следующий шаг</p>
+        <h2 id="learning-title">Где учиться дальше</h2>
+        <p>Необязательно читать всё подряд. Выберите один вводный курс или книгу, а затем переходите к той теме, которая нужна именно сейчас.</p>
+      </div>
+      <div class="learning-list">
+        {learningResources.map((resource, index) => (
+          <a class="learning-row" href={resource.href}>
+            <span class="learning-index">Ø{String(index + 1).padStart(2, '0')}</span>
+            <span class="learning-copy">
+              <small>{resource.marker}</small>
+              <strong>{resource.title}</strong>
+              <span>{resource.text}</span>
+            </span>
+            <span class="learning-arrow" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+      <p class="learning-note">В карточке каждого ресурса указано, чем он полезен, насколько актуален и где проходит граница между обучением, опытом сообщества и медицинской рекомендацией.</p>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .narrow { width: min(calc(100% - 2 * var(--page-gutter)), 52rem); }
+  .start-hero { padding: clamp(4rem, 9vw, 7rem) 0; border-bottom: 1px solid var(--blue); background: var(--paper); }
+  .start-hero .eyebrow { color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .start-hero h1 { margin: 0; max-width: 12ch; color: var(--blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display); letter-spacing: -.035em; }
+  .start-hero p:last-child { max-width: 42rem; margin-top: 1.5rem; color: var(--muted); font-size: 18px; line-height: 1.55; }
+  .steps { margin: 0; padding: 0; list-style: none; }
+  .steps li { display: grid; grid-template-columns: 2rem 1fr; gap: 1.5rem; padding: 2rem 0; }
+  .steps li { border-bottom: 1px dashed var(--line); }
+  .step-number { color: var(--blue); font: 400 18px/1.4 var(--font-mono); }
+  .steps h2 { margin: 0; color: var(--blue); font: 600 clamp(24px, 3vw, 34px)/1.1 var(--font-display); }
+  .steps p { color: var(--muted); }
+  .steps a { color: var(--blue); font-weight: 600; }
+  .safety-note { margin-top: 3rem; padding: 1.4rem 0; border-block: 1px solid var(--blue); border-radius: 0; background: transparent; color: var(--ink); }
+  .safety-note p { margin-bottom: 0; }
+  .learning-section { border-top: 1px solid var(--blue); background: var(--paper); }
+  .section-heading { padding-bottom: 2rem; }
+  .section-heading .eyebrow { margin: 0 0 .75rem; color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .section-heading h2 { max-width: 12ch; margin: 0; color: var(--blue); font: 600 clamp(34px, 5vw, 56px)/1 var(--font-display); letter-spacing: -.03em; }
+  .section-heading > p:last-child { max-width: 42rem; margin: 1rem 0 0; color: var(--muted); font-size: 18px; line-height: 1.55; }
+  .learning-list { border-top: 1px solid var(--blue); }
+  .learning-row { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) 2rem; gap: 1.25rem; align-items: start; padding: 1.5rem 0; border-bottom: 1px dashed var(--line); color: var(--ink); text-decoration: none; }
+  .learning-row:hover strong, .learning-row:focus-visible strong { text-decoration: underline; text-underline-offset: .18em; }
+  .learning-row:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+  .learning-index, .learning-arrow { color: var(--blue); font: 400 14px/1.4 var(--font-mono); }
+  .learning-arrow { font-size: 22px; text-align: right; }
+  .learning-copy { display: flex; min-width: 0; flex-direction: column; gap: .35rem; }
+  .learning-copy small { color: var(--muted); font: 400 10px/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .learning-copy strong { color: var(--blue); font: 600 clamp(21px, 2.6vw, 30px)/1.12 var(--font-display); }
+  .learning-copy > span { max-width: 43rem; color: var(--muted); font-size: 15px; line-height: 1.55; }
+  .learning-note { margin: 1.5rem 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+  @media (max-width: 42rem) {
+    .learning-row { grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem; gap: .75rem; }
+    .learning-copy > span { font-size: 14px; }
+  }
+</style>

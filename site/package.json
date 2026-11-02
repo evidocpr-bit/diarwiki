@@ -1,0 +1,40 @@
+{
+  "name": "diarwiki",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "lint": "astro check",
+    "build": "node scripts/check-review-markers.mjs && node scripts/check-review-evidence.mjs && astro check && astro build && node scripts/finalize-sitemaps.mjs && node scripts/check-search-index.mjs && node scripts/check-links.mjs && node scripts/check-site-contract.mjs",
+    "check:contract": "node scripts/check-site-contract.mjs",
+    "check:review": "node scripts/check-review-markers.mjs",
+    "check:review-evidence": "node scripts/check-review-evidence.mjs",
+    "review:hash": "node scripts/print-review-hash.mjs",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:e2e": "pnpm build && playwright test",
+    "indexnow:submit": "node scripts/submit-indexnow.mjs"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.0",
+    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/starlight": "^0.42.6",
+    "@fontsource-variable/golos-text": "^5.3.0",
+    "@fontsource-variable/inter-tight": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "astro": "^7.4.0",
+    "sanitize-html": "2.18.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.64.1",
+    "@types/sanitize-html": "2.16.0",
+    "axe-core": "^4.14.0",
+    "micromark": "4.0.3",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

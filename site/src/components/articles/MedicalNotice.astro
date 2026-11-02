@@ -1,0 +1,10 @@
+---
+interface Props { type?: 'important' | 'doctor' | 'device' | 'urgent'; title?: string; }
+const { type = 'important', title } = Astro.props;
+const config = { important: { label: 'Важно' }, doctor: { label: 'Сверьте с врачом' }, device: { label: 'Зависит от модели' }, urgent: { label: 'Когда нужна срочная помощь' } };
+const current = config[type];
+---
+{type === 'urgent' ? <aside class="medical-notice medical-notice--urgent"><div class="medical-notice__head"><span aria-hidden="true"></span><strong>{title ?? current.label}</strong></div><div class="medical-notice__body"><slot /></div></aside> : <aside class="medical-notice" role="note"><span class="medical-notice__icon" aria-hidden="true">i</span><div class="medical-notice__content"><strong>{title ?? current.label}</strong><div class="medical-notice__body"><slot /></div></div></aside>}
+<style>
+  .medical-notice{display:grid;grid-template-columns:56px minmax(0,1fr);margin:0;border:1px solid var(--dw-blue);color:var(--dw-ink)}.medical-notice__icon{border-right:1px solid var(--dw-blue);display:grid;place-items:center;color:var(--dw-blue);font:400 20px/1 var(--dw-font-mono)}.medical-notice__content{padding:16px 20px;display:flex;flex-direction:column;gap:4px}.medical-notice__content>strong{color:var(--dw-blue);font:500 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.medical-notice__body{font-size:16px;line-height:1.5}.medical-notice__body :global(p){margin:0}.medical-notice--urgent{display:block;border:1px solid var(--dw-ink);background:#fff}.medical-notice__head{display:flex;align-items:center;gap:10px;padding:12px 20px;background:var(--dw-signal);color:var(--dw-signal-ink);font:700 12px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.medical-notice__head>span{width:8px;height:8px;flex:none;border-radius:50%;background:var(--dw-signal-ink)}.medical-notice--urgent .medical-notice__body{padding:18px 20px;font-size:17px}
+</style>

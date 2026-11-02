@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { routePaths } from '../config/site';
+---
+
+<BaseLayout title="Срочная помощь" description="Куда обратиться, если человеку с диабетом нужна срочная помощь." canonicalPath={routePaths.urgent}>
+  <section class="urgent-page container" data-pagefind-ignore>
+    <p class="eyebrow">Если помощь нужна сейчас</p>
+    <h1>Не ждите ответа на сайте</h1>
+    <p class="lead">Если возникла угроза жизни или требуется срочная медицинская помощь, позвоните в экстренные службы. ДиарВики не принимает обращения и не отвечает в режиме реального времени.</p>
+
+    <div class="emergency-actions" aria-label="Телефоны экстренных служб">
+      <a class="emergency-card" href="tel:112"><span>Единый номер экстренных служб</span><strong>112</strong></a>
+      <a class="emergency-card emergency-card--secondary" href="tel:103"><span>Скорая медицинская помощь</span><strong>103</strong></a>
+    </div>
+
+    <p class="source-note">В России 112 — единый номер вызова экстренных служб; 103 — номер скорой медицинской помощи. <a href="https://60.mchs.gov.ru/deyatelnost/press-centr/novosti/5469897" rel="external">МЧС России: номера вызова экстренных служб</a>.</p>
+    <p class="boundary">Информация на этой странице справочная и не помогает определить причину состояния или выбрать лечение. Не откладывайте обращение к специалисту ради чтения сайта.</p>
+    <p><a href={routePaths.medicalDisclaimer}>О границах информации на ДиарВики</a></p>
+  </section>
+</BaseLayout>
+
+<style>
+  .urgent-page { max-width: 56rem; min-height: 70vh; padding-block: clamp(3rem, 8vw, 6rem); }
+  .urgent-page h1 { max-width: 14ch; margin: 0; color: var(--blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display); letter-spacing: -.035em; }
+  .lead { max-width: 44rem; margin-block: 1.5rem 2rem; color: var(--ink-muted); font-size: clamp(1.12rem, 2.6vw, 1.4rem); }
+  .emergency-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .emergency-card { display: flex; min-height: 9rem; flex-direction: column; justify-content: space-between; padding: 1.4rem; border: 1px solid var(--signal); border-radius: 0; background: var(--signal); color: var(--signal-text); text-decoration: none; }
+  .emergency-card:hover { color: var(--signal-text); background: var(--signal); text-decoration: underline; text-underline-offset: .2em; }
+  .emergency-card strong { font-size: clamp(2.5rem, 8vw, 4rem); line-height: 1; }
+  .emergency-card--secondary { border-color: var(--deep-blue); background: var(--deep-blue); color: var(--white); }
+  .emergency-card--secondary:hover { background: var(--brand-deep); }
+  .source-note, .boundary { margin-top: 1.5rem; color: var(--ink-muted); font-size: .92rem; }
+  .boundary { padding: 1rem 1.15rem; border-left: 4px solid var(--brand); background: var(--sky); }
+  @media (max-width: 36rem) { .emergency-actions { grid-template-columns: 1fr; } }
+</style>

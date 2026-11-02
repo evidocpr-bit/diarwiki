@@ -1,0 +1,9 @@
+{
+  "id": "nightscout-reports",
+  "title": "Create Reports — Nightscout Documentation",
+  "organization": "Nightscout Foundation",
+  "url": "https://nightscout.github.io/nightscout/reports/",
+  "language": "en",
+  "accessedAt": "2026-11-02",
+  "note": "Официальная документация по выбору периода и типам отчётов Nightscout, включая Distribution, TIR, GMI, GVI и PGS. Расчётные оценки не заменяют лабораторные анализы и медицинскую консультацию."
+}

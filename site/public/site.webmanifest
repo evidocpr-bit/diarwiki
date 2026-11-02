@@ -1,0 +1,10 @@
+{
+  "name": "ДиарВики",
+  "short_name": "ДиарВики",
+  "description": "Понятная информация о жизни с диабетом",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4bc4d2",
+  "icons": []
+}

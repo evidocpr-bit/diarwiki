@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ReviewBadge from '../../components/ReviewBadge.astro';
+import { contentRepository } from '../../lib/content';
+const items = await contentRepository.listPublished();
+const visible = items.filter((item) => item.type === 'article' || item.type === 'glossary');
+const materialNoun = (value: number) => {
+  const lastTwo = value % 100;
+  const last = value % 10;
+  if (last === 1 && lastTwo !== 11) return 'материал';
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return 'материала';
+  return 'материалов';
+};
+---
+<BaseLayout title="База знаний" description="Опубликованные материалы «ДиарВики» с источниками, датами обновления и статусами медицинской проверки.">
+  <section class="catalog-hero">
+    <div class="container">
+      <p class="eyebrow">Атлас знаний</p>
+      <h1>База знаний о диабете</h1>
+      <p>В каталоге показано только то, что действительно опубликовано. Статус проверки каждой версии обозначен отдельно.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <label class="filter-label" for="catalog-filter">Быстрый поиск по названиям и описаниям</label>
+      <input id="catalog-filter" class="catalog-filter" type="search" placeholder="Например: приём, источники, термины" autocomplete="off" />
+      <p class="result-count" aria-live="polite" data-count>{visible.length} {materialNoun(visible.length)}</p>
+      <div class="catalog-list" data-catalog>
+        {visible.map((item) => (
+          <a class="catalog-row" href={item.href} data-search={`${item.title} ${item.summary} ${item.topics.join(' ')}`.toLowerCase()}>
+            <span class="catalog-id">Ø{String(visible.indexOf(item) + 1).padStart(2, '0')}</span>
+            <span class="catalog-copy">
+              <span class="catalog-topic">{item.type === 'glossary' ? 'Словарь' : item.topics[0] ?? 'Материал'}</span>
+              <strong>{item.title}</strong>
+              <span class="catalog-summary">{item.summary}</span>
+              <div class="catalog-meta">Обновлено {item.updatedAt.toLocaleDateString('ru-RU')} · <ReviewBadge status={item.medicalReview} reviewer={item.reviewedBy} specialty={item.reviewerSpecialty} reviewedAt={item.reviewedAt} compact /></div>
+            </span>
+            <span class="catalog-arrow" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+      <p class="empty" data-empty hidden>По этому запросу ничего не найдено. Попробуйте более общее слово.</p>
+    </div>
+  </section>
+  <script>
+    const field = document.querySelector('#catalog-filter');
+    const cards = Array.from(document.querySelectorAll('[data-search]'));
+    const count = document.querySelector('[data-count]');
+    const empty = document.querySelector('[data-empty]');
+    const materialNoun = (value: number) => {
+      const lastTwo = value % 100;
+      const last = value % 10;
+      if (last === 1 && lastTwo !== 11) return 'материал';
+      if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return 'материала';
+      return 'материалов';
+    };
+    field?.addEventListener('input', () => {
+      const query = field instanceof HTMLInputElement ? field.value.trim().toLocaleLowerCase('ru') : '';
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const matched = (card.getAttribute('data-search') ?? '').includes(query);
+        if (card instanceof HTMLElement) card.hidden = !matched;
+        if (matched) visibleCount += 1;
+      });
+      if (count) count.textContent = `${visibleCount} ${materialNoun(visibleCount)}`;
+      if (empty instanceof HTMLElement) empty.hidden = visibleCount !== 0;
+    });
+  </script>
+</BaseLayout>
+<style>
+  .catalog-hero { padding: 68px 0 52px; border-bottom: 1px solid var(--blue); background: var(--paper); }
+  .catalog-hero .eyebrow { color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .catalog-hero h1 { margin: 0; max-width: 12ch; color: var(--blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display); letter-spacing: -.035em; }
+  .catalog-hero p:last-child { max-width: 48rem; color: var(--muted); font-size: 18px; }
+  .filter-label { display: block; margin-bottom: 8px; color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .catalog-filter { width: min(100%, 42rem); min-height: 48px; padding: 8px 0; border: 0; border-bottom: 1px solid var(--blue); border-radius: 0; background: transparent; color: var(--ink); font: 16px/1.4 var(--font-text); }
+  .catalog-filter:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  .result-count { color: var(--muted); font: 400 11px/1.5 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .catalog-list { margin-top: 16px; border-top: 1px solid var(--blue); }
+  .catalog-row { display: grid; grid-template-columns: 58px minmax(0,1fr) 28px; gap: 16px; align-items: start; padding: 22px 0; border-bottom: 1px dashed var(--line); color: var(--ink); text-decoration: none; }
+  .catalog-row[hidden] { display: none; }
+  .catalog-id { color: var(--blue); font: 400 15px/1.4 var(--font-mono); }
+  .catalog-copy { display: flex; flex-direction: column; gap: 7px; }
+  .catalog-topic { color: var(--blue); font: 400 10px/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .catalog-copy strong { color: var(--blue); font: 600 24px/1.1 var(--font-display); letter-spacing: -.02em; }
+  .catalog-summary { color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .catalog-meta { display: flex; flex-wrap: wrap; gap: 6px; color: var(--muted); font: 400 10px/1.5 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+  .catalog-arrow { color: var(--blue); font-size: 20px; }
+  .catalog-row:hover .catalog-arrow { transform: translate(3px,-3px); }
+  .empty { padding: 22px 0; border-bottom: 1px solid var(--line); color: var(--muted); }
+  @media (max-width: 42rem) { .catalog-row { grid-template-columns: 42px minmax(0,1fr) 20px; gap: 10px; padding: 18px 0; } .catalog-copy strong { font-size: 21px; } }
+</style>

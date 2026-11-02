@@ -1,0 +1,15 @@
+---
+import ArticleFigure from './ArticleFigure.astro';
+interface Props { number: number; title: string; image: string; imageAlt: string; caption?: string; reverse?: boolean; }
+const { number, title, image, imageAlt, caption } = Astro.props;
+const mark = String(number).padStart(2, '0');
+---
+<section class="article-step" aria-labelledby={`step-${number}`}>
+  <header class="article-step__heading"><span class="article-step__number" aria-hidden="true">Ø{mark}</span><h2 id={`step-${number}`}>{title}</h2></header>
+  <div class="article-step__body"><slot /></div>
+  <ArticleFigure src={image} alt={imageAlt} caption={caption} number={number} />
+</section>
+<style>
+  .article-step{display:flex;flex-direction:column;gap:18px;margin:0;scroll-margin-top:5rem}.article-step__heading{display:flex;gap:18px;align-items:baseline;border-top:1px solid var(--dw-blue);padding-top:18px}.article-step__number{flex:none;color:var(--dw-blue);font:400 40px/1 var(--dw-font-mono)}.article-step h2{margin:0;color:var(--dw-blue);font:600 34px/1.08 var(--dw-font-display);letter-spacing:-.025em}.article-step__body{font-size:18px;line-height:1.65}.article-step__body :global(p){margin:0 0 14px}.article-step__body :global(p:last-child){margin-bottom:0}.article-step__body :global(ul),.article-step__body :global(ol){padding-left:24px}
+  @media(max-width:760px){.article-step h2{font-size:28px}.article-step__number{font-size:34px}.article-step__body{font-size:17px}}
+</style>

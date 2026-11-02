@@ -1,0 +1,26 @@
+---
+interface Props {
+  status?: 'pending' | 'reviewed' | 'revision_required';
+  reviewer?: string | null;
+  specialty?: string | null;
+  reviewedAt?: Date | null;
+  compact?: boolean;
+}
+const { status = 'pending', reviewer, specialty, reviewedAt, compact = false } = Astro.props;
+const reviewedDate = reviewedAt?.toLocaleDateString('ru-RU', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric' });
+const label = status === 'reviewed'
+  ? `Проверено${reviewer ? `: ${reviewer}` : ''}${specialty ? `, ${specialty}` : ''}${reviewedDate ? ` · ${reviewedDate}` : ''}`
+  : status === 'revision_required'
+    ? 'Материал ожидает редакционного пересмотра'
+    : 'Материал редакции';
+---
+<p data-testid="article-review-status" class:list={['review-badge', `review-badge--${status}`, { 'review-badge--compact': compact }]} aria-label={status === 'reviewed' ? `Медицинская рецензия. ${label}` : label}>
+  {status === 'reviewed' && <span aria-hidden="true">✓</span>}
+  {label}
+</p>
+<style>
+  .review-badge { display: inline-flex; align-items: center; gap: .35rem; margin: 0; padding: 0; color: var(--dw-muted); font:400 13px/1.4 var(--dw-font-text); }
+  .review-badge--reviewed { color: var(--dw-blue); }
+  .review-badge--revision_required { color: var(--dw-muted); }
+  .review-badge--compact { padding: 0; border-radius: 0; background: transparent; font-size: .78rem; }
+</style>

@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "dashboards": [
+    {
+      "key": "editorial-center",
+      "name": "Редакционный центр",
+      "icon": "space_dashboard",
+      "color": "#315C82",
+      "note": "Очереди материалов и состояние выпусков DiarWiki.",
+      "roles": ["owner", "editor", "medical_reviewer"],
+      "panels": [
+        {
+          "key": "drafts",
+          "name": "Черновики",
+          "icon": "draft",
+          "color": "#6E6E6E",
+          "type": "metric",
+          "position_x": 1,
+          "position_y": 1,
+          "width": 6,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "materials", "field": "id", "function": "count", "filter": { "workflow_status": { "_eq": "draft" } } }
+        },
+        {
+          "key": "editorial-review",
+          "name": "На редактуре",
+          "icon": "fact_check",
+          "color": "#315C82",
+          "type": "metric",
+          "position_x": 7,
+          "position_y": 1,
+          "width": 6,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "materials", "field": "id", "function": "count", "filter": { "workflow_status": { "_eq": "editorial_review" } } }
+        },
+        {
+          "key": "medical-review",
+          "name": "У врача",
+          "icon": "clinical_notes",
+          "color": "#9D4949",
+          "type": "metric",
+          "position_x": 13,
+          "position_y": 1,
+          "width": 6,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "materials", "field": "id", "function": "count", "filter": { "workflow_status": { "_eq": "medical_review" } } }
+        },
+        {
+          "key": "ready",
+          "name": "Готово к выпуску",
+          "icon": "task_alt",
+          "color": "#2E7253",
+          "type": "metric",
+          "position_x": 19,
+          "position_y": 1,
+          "width": 6,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "materials", "field": "id", "function": "count", "filter": { "workflow_status": { "_eq": "ready_to_publish" } } }
+        },
+        {
+          "key": "changes-required",
+          "name": "Нужны исправления",
+          "icon": "edit_alert",
+          "color": "#B16A2B",
+          "type": "metric",
+          "position_x": 1,
+          "position_y": 5,
+          "width": 8,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "materials", "field": "id", "function": "count", "filter": { "workflow_status": { "_in": ["changes_requested", "revision_required"] } } }
+        },
+        {
+          "key": "publish-failed",
+          "name": "Ошибки выпуска",
+          "icon": "error",
+          "color": "#B3261E",
+          "type": "metric",
+          "position_x": 9,
+          "position_y": 5,
+          "width": 8,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "release_requests", "field": "id", "function": "count", "filter": { "status": { "_eq": "failed" } } }
+        },
+        {
+          "key": "rights-pending",
+          "name": "Медиа без подтверждённых прав",
+          "icon": "copyright",
+          "color": "#B16A2B",
+          "type": "metric",
+          "position_x": 17,
+          "position_y": 5,
+          "width": 8,
+          "height": 4,
+          "show_header": true,
+          "options": { "collection": "media_metadata", "field": "id", "function": "count", "filter": { "rights_status": { "_in": ["pending", "restricted"] } } }
+        },
+        {
+          "key": "recent-releases",
+          "name": "Последние выпуски",
+          "icon": "deployed_code",
+          "color": "#2E7253",
+          "type": "list",
+          "position_x": 1,
+          "position_y": 9,
+          "width": 24,
+          "height": 8,
+          "show_header": true,
+          "options": { "collection": "releases", "fields": ["release_number", "status", "activated_at"], "limit": 8, "sort": "-created_at", "displayTemplate": "{{release_number}} — {{status}}" }
+        }
+      ]
+    }
+  ]
+}

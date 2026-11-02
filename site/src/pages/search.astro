@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { routePaths } from '../config/site';
+
+const initialQuery = Astro.url.searchParams.get('q')?.trim() ?? '';
+---
+
+<BaseLayout title="Поиск по сайту" description="Найдите статьи, понятия и материалы библиотеки ДиарВики." canonicalPath={routePaths.search} indexable={false}>
+  <section class="search-page container" data-pagefind-ignore>
+    <p class="eyebrow">Поиск по ДиарВики</p>
+    <h1>Что хотите найти?</h1>
+    <form id="site-search-form" action={routePaths.search} method="get" role="search">
+      <label for="site-search-query">Тема, вопрос или название устройства</label>
+      <div class="search-controls">
+        <input id="site-search-query" name="q" type="search" value={initialQuery} autocomplete="off" />
+        <button class="button" type="submit">Найти</button>
+      </div>
+    </form>
+    <p id="site-search-status" role="status" aria-live="polite">Введите запрос, чтобы найти материалы по всему сайту.</p>
+    <ol id="site-search-results" class="search-results" aria-label="Результаты поиска"></ol>
+  </section>
+</BaseLayout>
+
+<script is:inline type="module">
+  const form = document.querySelector('#site-search-form');
+  const input = document.querySelector('#site-search-query');
+  const status = document.querySelector('#site-search-status');
+  const results = document.querySelector('#site-search-results');
+
+  const runSearch = async (query) => {
+    if (!(input instanceof HTMLInputElement) || !(status instanceof HTMLElement) || !(results instanceof HTMLOListElement)) return;
+    const normalizedQuery = query.trim();
+    results.replaceChildren();
+    if (!normalizedQuery) {
+      status.textContent = 'Введите запрос, чтобы найти материалы по всему сайту.';
+      return;
+    }
+
+    status.textContent = 'Ищем материалы…';
+    try {
+      const pagefind = await import('/pagefind/pagefind.js');
+      const response = await pagefind.search(normalizedQuery);
+      const entries = await Promise.all(response.results.slice(0, 25).map((result) => result.data()));
+      if (entries.length === 0) {
+        status.textContent = `По запросу «${normalizedQuery}» ничего не найдено.`;
+        return;
+      }
+
+      status.textContent = `Найдено материалов: ${entries.length}${response.results.length > entries.length ? ' и другие' : ''}.`;
+      for (const entry of entries) {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = new URL(entry.url, window.location.origin).pathname;
+        link.textContent = entry.meta?.title || 'Открыть материал';
+        const excerpt = document.createElement('p');
+        excerpt.textContent = new DOMParser().parseFromString(entry.excerpt || '', 'text/html').body.textContent?.trim() || '';
+        item.append(link, excerpt);
+        results.append(item);
+      }
+    } catch {
+      status.textContent = 'Поиск временно недоступен. Попробуйте обновить страницу.';
+    }
+  };
+
+  if (form instanceof HTMLFormElement && input instanceof HTMLInputElement) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const query = input.value.trim();
+      const url = new URL(window.location.href);
+      if (query) url.searchParams.set('q', query);
+      else url.searchParams.delete('q');
+      window.history.replaceState({}, '', url);
+      void runSearch(query);
+    });
+
+    const initialQuery = new URL(window.location.href).searchParams.get('q')?.trim() ?? '';
+    input.value = initialQuery;
+    if (initialQuery) void runSearch(initialQuery);
+  }
+</script>
+
+<style>
+  .search-page { max-width: 760px; min-height: 65vh; padding-block: clamp(4rem, 9vw, 7rem); }
+  .search-page > .eyebrow { color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .search-page h1 { max-width: 12ch; margin: 0 0 2rem; color: var(--blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display); letter-spacing: -.035em; }
+  #site-search-form label { display: block; margin-bottom: .55rem; color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .search-controls { display: flex; gap: .5rem; }
+  .search-controls input { flex: 1; min-width: 0; min-height: 3.5rem; padding: .7rem .9rem; border: 0; border-bottom: 1px solid var(--blue); border-radius: 0; background: transparent; color: var(--ink); font: inherit; }
+  .search-controls .button { min-width: 6rem; }
+  #site-search-status { margin-block: 1.5rem; color: var(--muted); font: 400 12px/1.5 var(--font-mono); letter-spacing: .05em; }
+  .search-results { display: grid; gap: .75rem; margin: 0; padding: 0; list-style: none; }
+  .search-results li { padding: 1.1rem 0; border-bottom: 1px dashed var(--line); }
+  .search-results li a { color: var(--blue); font: 600 22px/1.2 var(--font-display); }
+  .search-results li p { margin: .4rem 0 0; color: var(--muted); font-size: 15px; }
+  @media (max-width: 36rem) { .search-controls { align-items: stretch; flex-direction: column; } }
+</style>

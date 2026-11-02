@@ -1,0 +1,50 @@
+---
+import ReviewBadge from '../ReviewBadge.astro';
+import { contentRepository } from '../../lib/content';
+import { siteIdentity } from '../../config/site';
+
+const route = Astro.locals.starlightRoute;
+const data = route.entry.data;
+const publishedArticles = await contentRepository.listPublished('article');
+const orderedTopicArticles = publishedArticles.filter((article) => article.topics.includes('Датчики'));
+const articleOrder = data.order ?? Math.max(1, orderedTopicArticles.findIndex((article) => article.slug === route.entry.id) + 1);
+const updated = data.updatedAt.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const levelLabels = { basic: 'Базовый', practical: 'Практический', advanced: 'Углублённый' } as const;
+const isReviewed = data.medicalReview === 'reviewed';
+const articleBody = typeof route.entry.body === 'string' ? route.entry.body : '';
+const readingMinutes = Math.max(1, Math.ceil(`${data.summary} ${articleBody}`.trim().split(/\s+/u).length / 220));
+const schema = {
+  '@context': 'https://schema.org', '@type': 'MedicalWebPage', '@id': `${siteIdentity.origin}/${route.entry.id}/#article`,
+  url: `${siteIdentity.origin}/${route.entry.id}/`, headline: data.title, description: data.description,
+  ...(data.publishedAt ? { datePublished: data.publishedAt.toISOString().slice(0, 10) } : {}), dateModified: data.updatedAt.toISOString().slice(0, 10),
+  inLanguage: 'ru-RU', isPartOf: { '@id': `${siteIdentity.origin}/#website` }, publisher: { '@id': `${siteIdentity.origin}/#organization` },
+  about: data.topics.map((name) => ({ '@type': 'Thing', name })),
+  ...(isReviewed && data.reviewedBy ? { reviewedBy: { '@type': 'Person', name: data.reviewedBy, jobTitle: data.reviewerSpecialty ?? undefined, url: data.reviewerProfileUrl ?? undefined }, lastReviewed: data.reviewedAt?.toISOString().slice(0, 10) } : {}),
+};
+---
+<section class="article-page-title">
+  <nav class="article-breadcrumbs" aria-label="Хлебные крошки"><a href="/">Главная</a><span>/</span><a href="/knowledge/">База знаний</a><span>/</span><span>{data.topics[0] ?? 'Материал'}</span></nav>
+  <div class="article-title-grid">
+    <div class="article-title-copy">
+      <p class="article-kicker">{data.topics[0] ?? 'Материал'} · материал Ø{articleOrder} из {orderedTopicArticles.length || 1}</p>
+      <h1 id="_top">{data.title}</h1>
+      <p class="article-summary">{data.summary}</p>
+    </div>
+    <dl class="article-facts">
+      <div><dt>Обновлено</dt><dd>{updated}</dd></div>
+      <div><dt>Проверка</dt><dd><ReviewBadge status={data.medicalReview} reviewer={data.reviewedBy} specialty={data.reviewerSpecialty} reviewedAt={data.reviewedAt} compact /></dd></div>
+      <div><dt>Уровень</dt><dd>{levelLabels[data.level]}</dd></div>
+      <div><dt>Для кого</dt><dd>{data.audience.join(', ') || 'Читатели'}</dd></div>
+      <div><dt>Чтение</dt><dd>≈ {readingMinutes} мин</dd></div>
+    </dl>
+  </div>
+</section>
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<div class="reading-progress" aria-hidden="true"><span></span></div>
+<style>
+  .article-page-title{max-width:1320px;margin:0 auto;padding:0 var(--dw-pad)}.article-breadcrumbs{display:flex;flex-wrap:wrap;gap:12px;padding:18px 0;border-bottom:1px dashed var(--dw-line);color:var(--dw-blue);font:400 12px/1.4 var(--dw-font-mono);letter-spacing:.12em;text-transform:uppercase}.article-breadcrumbs a{color:inherit;text-decoration:none}.article-breadcrumbs span:last-child{color:var(--dw-muted)}.article-title-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.65fr);gap:56px;align-items:end;padding:104px 0 88px}.article-kicker{margin:0 0 20px;color:var(--dw-blue);font:400 12px/1.4 var(--dw-font-mono);letter-spacing:.16em;text-transform:uppercase}.article-title-copy h1{max-width:15ch;margin:0;color:var(--dw-blue);font:600 clamp(40px,5.4vw,76px)/.98 var(--dw-font-display);letter-spacing:-.035em}.article-summary{max-width:54rem;margin:18px 0 0;font-size:20px;line-height:1.5}.article-facts{margin:0}.article-facts>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;padding:9px 0;border-bottom:1px solid var(--dw-line);font-size:14px;line-height:1.4}.article-facts>div:first-child{border-top:1px solid var(--dw-blue)}.article-facts dt{color:var(--dw-muted);font:400 11px/1.5 var(--dw-font-mono);letter-spacing:.1em;text-transform:uppercase}.article-facts dd{margin:0;color:var(--dw-ink)}
+  @media(max-width:760px){.article-title-grid{grid-template-columns:1fr;gap:28px;padding:56px 0}.article-title-copy h1{font-size:clamp(40px,12vw,56px)}.article-summary{font-size:18px}.article-facts>div{grid-template-columns:112px minmax(0,1fr)}}
+  .reading-progress{position:fixed;z-index:30;inset:115px 0 auto;height:3px;background:transparent}.reading-progress>span{display:block;width:100%;height:100%;background:var(--dw-blue);transform-origin:left;transform:scaleX(0)}
+  @supports(animation-timeline:scroll()){ @media(prefers-reduced-motion:no-preference){.reading-progress>span{animation:reading-progress linear both;animation-timeline:scroll(root block)}@keyframes reading-progress{to{transform:scaleX(1)}}}}
+  @media(max-width:760px){.reading-progress{inset-block-start:63px}}
+</style>

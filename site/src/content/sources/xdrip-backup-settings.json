@@ -1,0 +1,9 @@
+{
+  "id": "xdrip-backup-settings",
+  "title": "xDrip+ application resources: database and settings export",
+  "organization": "Nightscout Foundation; xDrip+",
+  "url": "https://github.com/NightscoutFoundation/xDrip/blob/c42cf55c6b972215654bc2a34ce563c87a7aa594/app/src/main/res/values/strings.xml",
+  "language": "en",
+  "accessedAt": "2026-11-02",
+  "note": "Основной репозиторий Nightscout Foundation на зафиксированном коммите подтверждает раздельные команды экспорта базы и настроек и предупреждает о чувствительных сведениях в конфигурации. Названия меню в других сборках могут отличаться."
+}

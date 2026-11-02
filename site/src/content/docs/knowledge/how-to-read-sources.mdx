@@ -1,0 +1,84 @@
+---
+title: Как читать медицинские источники
+description: Проверка источника по автору, дате, аудитории, стране, устройству и реальному содержанию ссылки.
+summary: Надёжность источника зависит не только от логотипа. Важно понять, на какой вопрос, для кого и при каких условиях он отвечает.
+schemaVersion: 1
+contentId: article-read-sources
+contentType: article
+status: published
+audience: [взрослые, близкие]
+topics: [Источники]
+medicalReview: pending
+reviewedBy: null
+reviewedAt: null
+publishedAt: 2026-10-17
+updatedAt: 2026-10-20
+lastUpdated: 2026-10-20
+sourceIds: [niddk-what-is-diabetes, endocrinology-center-diabetes-institute, rule15-sugar-person, uptodate-t1d-glycemic-management]
+relatedIds: [article-prepare-appointment, glossary-basic-terms]
+risk: low
+articleFormat: guide
+level: practical
+disclaimerScope: standard
+tableOfContents: true
+---
+
+import QuickAnswer from '../../../components/articles/QuickAnswer.astro';
+import FlowDiagram from '../../../components/articles/FlowDiagram.astro';
+import SourceStory from '../../../components/articles/SourceStory.astro';
+import ArticleSources from '../../../components/articles/ArticleSources.astro';
+import NextArticle from '../../../components/articles/NextArticle.astro';
+
+<QuickAnswer title="Проверьте шесть вещей">
+  Кто отвечает за текст? Когда его обновляли? Для кого он написан? В какой стране действует? Для какой модели или версии? Подтверждает ли ссылка именно то утверждение, рядом с которым стоит?
+</QuickAnswer>
+
+<FlowDiagram title="Фильтр перед применением совета" items={[
+  { label: 'Автор', note: 'Организация, автор, редактор и конфликт интересов.' },
+  { label: 'Дата', note: 'Особенно важна для приложений, устройств, препаратов и правил.' },
+  { label: 'Аудитория', note: 'Взрослые, дети, беременность и разные типы диабета — не одно и то же.' },
+  { label: 'Условия', note: 'Страна, модель, версия, единицы измерения и доступность.' },
+  { label: 'Доказательство', note: 'Откройте ссылку и найдите утверждение в самом источнике.' },
+]} />
+
+## Один вопрос — разные подходящие источники
+
+<table class="comparison-table" tabindex="0" aria-label="Какие источники подходят для разных вопросов">
+  <thead><tr><th>Вопрос</th><th>Лучший первый источник</th><th>Что он не заменяет</th></tr></thead>
+  <tbody>
+    <tr><td>Что делать в приложении?</td><td>Инструкция конкретной модели и версии</td><td>Личный план лечения</td></tr>
+    <tr><td>Как обычно ведут заболевание?</td><td>Действующая клиническая рекомендация</td><td>Решение врача для конкретного человека</td></tr>
+    <tr><td>Что показало исследование?</td><td>Полный текст исследования и его методы</td><td>Оценку применимости к вашей ситуации</td></tr>
+    <tr><td>Как люди решают редкий технический сбой?</td><td>Сообщество с точной конфигурацией и шагами</td><td>Официальную поддержку и гарантию</td></tr>
+  </tbody>
+</table>
+
+## Пример: книга может быть полезной и устаревшей одновременно
+
+<SourceStory title="«Сахарный человек»" href="https://rule15s.com/" kind="Разбор применимости" caution="Технологии, препараты, целевые показатели и социальные правила из издания 2017 года нельзя переносить без новой проверки.">
+  Книга остаётся хорошим введением в повседневные темы и примером ясного пациентского языка. Но полезность объяснения не делает каждую медицинскую деталь актуальной навсегда.
+</SourceStory>
+
+## Пример: профессиональная база — не готовая памятка
+
+<SourceStory title="UpToDate: Glycemic management in adults with type 1 diabetes mellitus" href="https://www.uptodate.com/contents/glycemic-management-in-adults-with-type-1-diabetes-mellitus" kind="Профессиональный обзор" caution="Материал ориентирован на специалистов и международную практику; назначения и регистрационный статус препаратов требуется проверять для России.">
+  Обзор связывает цели, CGM, инсулин, помпы, питание и наблюдение. Для редакции это карта доказательств; для читателя — не инструкция по самостоятельной смене лечения.
+</SourceStory>
+
+## Красные флаги
+
+- нет автора, даты и первичной ссылки;
+- обещан результат «для всех»;
+- брендовый материал скрывает коммерческую роль;
+- исследование на одной группе пересказывают как правило для другой;
+- пользовательский способ называют официальным;
+- ссылка ведёт на главную страницу, а не на подтверждение тезиса.
+
+<ArticleSources sources={[
+  { title: 'Что такое сахарный диабет', organization: 'NIDDK', href: 'https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes', note: 'Пример пациентского материала государственной профильной организации с указанной датой проверки.' },
+  { title: 'Институт диабета', organization: 'НМИЦ эндокринологии', href: 'https://www.endocrincentr.ru/departments/institut-diabeta', note: 'Пример российского профильного учреждения; отдельные утверждения всё равно проверяются по конкретным документам.' },
+]} />
+
+<NextArticle href="/knowledge/glossary/" title="Открыть словарь" description="Быстро проверить значение термина, прежде чем читать сложный источник." />
+
+[Нашли источник, который стоит разобрать? Напишите редакции](/contact/).

@@ -1,0 +1,24 @@
+[Unit]
+Description=DiarWiki preview authorization service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=diarwiki-preview
+Group=diarwiki-preview
+WorkingDirectory=/opt/diarwiki/current
+EnvironmentFile=/etc/diarwiki/preview.env
+ExecStart=/usr/bin/node /opt/diarwiki/current/cms/preview/preview-auth-server.mjs
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/diarwiki-previews
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

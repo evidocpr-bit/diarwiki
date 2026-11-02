@@ -1,0 +1,29 @@
+---
+import Icon from './Icon.astro';
+interface Props { href: string; tab: string; title: string; description: string; icon: string; items: string[]; count: number; }
+const { href, tab, title, description, icon, items, count } = Astro.props;
+const noun = title === 'Выбираю книгу или приложение' ? 'ресурсов' : count % 10 === 1 && count % 100 !== 11 ? 'материал' : 'материала';
+---
+<a class="folder icon-host reveal" href={href}>
+  <span class="folder-tab">{tab}</span>
+  <span class="folder-back" aria-hidden="true"></span>
+  <span class="folder-sheet" aria-hidden="true">
+    <span class="folder-sheet__count">Внутри · {count} {noun}</span>
+    {items.slice(0, 3).map((item) => <span class="folder-sheet__item">{item}</span>)}
+  </span>
+  <span class="folder-front">
+    <Icon name={icon} />
+    <span class="folder-title">{title}</span>
+    <span class="folder-description">{description}<span class="arrow" aria-hidden="true">↗</span></span>
+  </span>
+</a>
+<style>
+  .folder-title{margin-top:auto;font-family:var(--dw-font-display);font-weight:600;font-size:26px;line-height:1.08;letter-spacing:-.02em}.folder-description{display:flex;justify-content:space-between;align-items:end;gap:12px;font-size:14px;line-height:1.45;color:rgb(255 255 255 / 82%)}.folder-description .arrow{flex:none;font-size:22px;color:#fff}.folder-sheet__count{font-family:var(--dw-font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--b)}.folder-sheet__item{font-size:13px;border-bottom:1px dashed var(--line);padding-bottom:6px}.folder-sheet__item:last-child{border:0;padding-bottom:0}
+</style>
+<style>
+  @media (max-width: 760px) {
+    .folder { height: 312px; }
+    .folder-front { height: 228px; padding: 24px; }
+    .folder-title { font-size: 24px; }
+  }
+</style>

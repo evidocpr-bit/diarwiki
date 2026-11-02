@@ -1,0 +1,23 @@
+[Unit]
+Description=DiarWiki CMS release worker
+After=network-online.target directus.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=diarwiki-release
+Group=diarwiki
+WorkingDirectory=/opt/diarwiki
+EnvironmentFile=/etc/diarwiki/release.env
+ExecStart=/usr/bin/node /opt/diarwiki/cms/release/run-release.mjs
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/diarwiki /var/lib/diarwiki-release /tmp
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictSUIDSGID=yes
+UMask=0027
+TimeoutStartSec=30min
+

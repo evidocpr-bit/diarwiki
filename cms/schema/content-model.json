@@ -1,0 +1,579 @@
+{
+  "schemaVersion": 1,
+  "name": "diarwiki-cms",
+  "description": "Проверяемый контракт данных внутренней CMS ДиарВики",
+  "allowedSystemRelations": [
+    "directus_users",
+    "directus_files",
+    "directus_versions"
+  ],
+  "enums": {
+    "workflow_status": [
+      "draft",
+      "editorial_review",
+      "changes_requested",
+      "medical_review",
+      "revision_required",
+      "ready_to_publish",
+      "published",
+      "publish_failed",
+      "archived"
+    ],
+    "risk_level": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "block_type": [
+      "rich_text",
+      "quick_answer",
+      "learning_list",
+      "article_step",
+      "medical_notice",
+      "figure",
+      "flow_diagram",
+      "source_story",
+      "sources",
+      "next_material",
+      "contact_prompt"
+    ],
+    "content_type": [
+      "article",
+      "pathway",
+      "glossary",
+      "page"
+    ],
+    "medical_review_status": [
+      "pending",
+      "reviewed",
+      "revision_required"
+    ],
+    "article_format": [
+      "guide",
+      "explainer",
+      "reference"
+    ],
+    "content_level": [
+      "basic",
+      "practical",
+      "advanced"
+    ],
+    "disclaimer_scope": [
+      "standard",
+      "device",
+      "treatment",
+      "emergency"
+    ],
+    "review_decision": [
+      "changes_requested",
+      "approved"
+    ],
+    "assignment_status": [
+      "assigned",
+      "in_review",
+      "completed",
+      "cancelled"
+    ],
+    "release_status": [
+      "queued",
+      "building",
+      "verifying",
+      "published",
+      "failed",
+      "rolled_back"
+    ],
+    "rights_status": [
+      "pending",
+      "approved",
+      "restricted"
+    ],
+    "media_security_status": [
+      "pending",
+      "passed",
+      "failed"
+    ],
+    "link_status": [
+      "public",
+      "hidden_pending_permission",
+      "removed"
+    ],
+    "redirect_status": [
+      "active",
+      "disabled"
+    ]
+  },
+  "reviewFingerprint": [
+    "materials.public_fields",
+    "material_blocks.ordered_payload",
+    "sources.resolved_public_fields",
+    "media.sha256",
+    "media.public_metadata",
+    "medical_notices.payload"
+  ],
+  "collections": [
+    {
+      "name": "materials",
+      "label": "Материалы",
+      "versioning": true,
+      "archiveField": "workflow_status",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "content_id", "type": "string", "required": true, "unique": true, "immutable": true, "public": true, "maxLength": 120 },
+        { "name": "slug", "type": "string", "required": true, "unique": true, "immutable": true, "public": true, "maxLength": 160 },
+        { "name": "content_type", "type": "enum", "enum": "content_type", "required": true, "default": "article", "public": true },
+        { "name": "title", "type": "string", "required": true, "public": true, "reviewed": true, "maxLength": 220 },
+        { "name": "description", "type": "text", "required": true, "public": true, "reviewed": true },
+        { "name": "summary", "type": "text", "required": true, "public": true, "reviewed": true },
+        { "name": "workflow_status", "type": "enum", "enum": "workflow_status", "required": true, "default": "draft" },
+        { "name": "medical_review_status", "type": "enum", "enum": "medical_review_status", "required": true, "default": "pending", "public": true },
+        { "name": "risk", "type": "enum", "enum": "risk_level", "required": true, "default": "low", "public": true, "reviewed": true },
+        { "name": "article_format", "type": "enum", "enum": "article_format", "required": true, "default": "reference", "public": true },
+        { "name": "level", "type": "enum", "enum": "content_level", "required": true, "default": "basic", "public": true },
+        { "name": "disclaimer_scope", "type": "enum", "enum": "disclaimer_scope", "required": true, "default": "standard", "public": true, "reviewed": true },
+        { "name": "sort_order", "type": "integer", "required": false, "public": true },
+        { "name": "audiences", "type": "json", "required": true, "default": [], "public": true, "reviewed": true },
+        { "name": "topics", "type": "json", "required": true, "default": [], "public": true, "reviewed": true },
+        { "name": "table_of_contents", "type": "boolean", "required": true, "default": true, "public": true },
+        { "name": "responsible_editor", "type": "relation", "required": false, "relation": { "kind": "many-to-one", "target": "directus_users" } },
+        { "name": "assigned_reviewer", "type": "relation", "required": false, "relation": { "kind": "many-to-one", "target": "directus_users" } },
+        { "name": "blocks", "type": "relation", "alias": true, "required": false, "relation": { "kind": "one-to-many", "target": "material_blocks", "foreignField": "material" } },
+        { "name": "source_links", "type": "relation", "alias": true, "required": false, "relation": { "kind": "one-to-many", "target": "material_sources", "foreignField": "material" } },
+        { "name": "related_links", "type": "relation", "alias": true, "required": false, "relation": { "kind": "one-to-many", "target": "material_relations", "foreignField": "material" } },
+        { "name": "review_assignments", "type": "relation", "alias": true, "required": false, "relation": { "kind": "one-to-many", "target": "review_assignments", "foreignField": "material" } },
+        { "name": "medical_reviews", "type": "relation", "alias": true, "required": false, "relation": { "kind": "one-to-many", "target": "medical_reviews", "foreignField": "material" } },
+        { "name": "editorial_comments", "type": "relation", "alias": true, "required": false, "relation": { "kind": "one-to-many", "target": "editorial_comments", "foreignField": "material" } },
+        { "name": "review_fingerprint", "type": "string", "format": "sha256", "maxLength": 64, "required": false, "immutable": false },
+        { "name": "published_at", "type": "datetime", "required": false, "public": true },
+        { "name": "public_updated_at", "type": "date", "required": false, "public": true, "reviewed": true },
+        { "name": "created_at", "type": "datetime", "required": true, "system": true },
+        { "name": "updated_at", "type": "datetime", "required": true, "system": true }
+      ],
+      "indexes": [
+        { "fields": ["content_id"], "unique": true },
+        { "fields": ["slug"], "unique": true },
+        { "fields": ["workflow_status", "risk"] }
+      ]
+    },
+    {
+      "name": "material_blocks",
+      "label": "Блоки материалов",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "sort_order", "type": "integer", "required": true },
+        { "name": "block_type", "type": "enum", "enum": "block_type", "required": true },
+        { "name": "item", "type": "relation", "required": true, "relation": { "kind": "many-to-any", "target": ["block_rich_text", "block_quick_answer", "block_learning_list", "block_article_step", "block_medical_notice", "block_figure", "block_flow_diagram", "block_source_story", "block_sources", "block_next_material", "block_contact_prompt"] } }
+      ],
+      "indexes": [
+        { "fields": ["material", "sort_order"], "unique": true }
+      ]
+    },
+    {
+      "name": "material_sources",
+      "label": "Источники материалов",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "source", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "sources", "onDelete": "restrict" } },
+        { "name": "sort_order", "type": "integer", "required": true },
+        { "name": "note", "type": "text", "required": false, "public": true, "reviewed": true }
+      ],
+      "indexes": [
+        { "fields": ["material", "source"], "unique": true }
+      ]
+    },
+    {
+      "name": "material_relations",
+      "label": "Связанные материалы",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "related_material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "restrict" } },
+        { "name": "sort_order", "type": "integer", "required": true }
+      ],
+      "indexes": [
+        { "fields": ["material", "related_material"], "unique": true }
+      ]
+    },
+    {
+      "name": "block_rich_text",
+      "label": "Обычный текст",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "content", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_quick_answer",
+      "label": "Краткий ответ",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "title", "type": "string", "required": false, "public": true, "reviewed": true },
+        { "name": "content", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_learning_list",
+      "label": "Что будет изучено",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "items", "type": "json", "required": true, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_article_step",
+      "label": "Шаг инструкции",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "step_number", "type": "integer", "required": true, "public": true, "reviewed": true },
+        { "name": "title", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "content", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true, "reviewed": true },
+        { "name": "media", "type": "relation", "required": false, "relation": { "kind": "many-to-one", "target": "media_metadata", "onDelete": "restrict" }, "public": true, "reviewed": true },
+        { "name": "caption", "type": "text", "required": false, "public": true, "reviewed": true },
+        { "name": "reverse", "type": "boolean", "required": true, "default": false, "public": true }
+      ]
+    },
+    {
+      "name": "block_medical_notice",
+      "label": "Медицинское предупреждение",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "scope", "type": "enum", "enum": "disclaimer_scope", "required": true, "public": true, "reviewed": true },
+        { "name": "title", "type": "string", "required": false, "public": true, "reviewed": true },
+        { "name": "content", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_figure",
+      "label": "Иллюстрация",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "media", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "media_metadata", "onDelete": "restrict" }, "public": true, "reviewed": true },
+        { "name": "caption", "type": "text", "required": false, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_flow_diagram",
+      "label": "Схема последовательности",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "title", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "items", "type": "json", "required": true, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_source_story",
+      "label": "Карточка источника",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "source", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "sources", "onDelete": "restrict" }, "public": true, "reviewed": true },
+        { "name": "title_override", "type": "string", "required": false, "public": true, "reviewed": true },
+        { "name": "kind", "type": "string", "required": false, "public": true, "reviewed": true },
+        { "name": "caution", "type": "text", "required": false, "public": true, "reviewed": true },
+        { "name": "content", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_sources",
+      "label": "Список источников",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "title", "type": "string", "required": true, "default": "Источники", "public": true },
+        { "name": "include_all_material_sources", "type": "boolean", "required": true, "default": true, "public": true }
+      ]
+    },
+    {
+      "name": "block_next_material",
+      "label": "Следующий материал",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "target", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "restrict" }, "public": true },
+        { "name": "description_override", "type": "text", "required": false, "public": true, "reviewed": true }
+      ]
+    },
+    {
+      "name": "block_contact_prompt",
+      "label": "Сообщить о неточности",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "label", "type": "string", "required": true, "default": "Нашли неточность? Сообщите редакции", "public": true },
+        { "name": "href", "type": "string", "required": true, "default": "/contact/", "public": true }
+      ]
+    },
+    {
+      "name": "sources",
+      "label": "Источники",
+      "versioning": true,
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "source_id", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "title", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "author_or_organization", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "url", "type": "string", "required": false, "public": true, "reviewed": true },
+        { "name": "doi", "type": "string", "required": false, "public": true, "reviewed": true },
+        { "name": "bibliographic_description", "type": "text", "required": false, "public": true, "reviewed": true },
+        { "name": "language", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "source_type", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "accessed_at", "type": "date", "required": true, "public": true, "reviewed": true },
+        { "name": "link_checked_at", "type": "datetime", "required": false },
+        { "name": "editorial_note", "type": "text", "required": false }
+      ],
+      "indexes": [
+        { "fields": ["source_id"], "unique": true }
+      ]
+    },
+    {
+      "name": "library_items",
+      "label": "Библиотека",
+      "versioning": true,
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "library_id", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "slug", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "title", "type": "string", "required": true, "public": true },
+        { "name": "description", "type": "text", "required": true, "public": true },
+        { "name": "category", "type": "string", "required": true, "public": true },
+        { "name": "resource_type", "type": "string", "required": true, "public": true },
+        { "name": "author_or_organization", "type": "string", "required": false, "public": true },
+        { "name": "publisher", "type": "string", "required": false, "public": true },
+        { "name": "source_year", "type": "string", "required": false, "public": true },
+        { "name": "language", "type": "string", "required": false, "public": true },
+        { "name": "format", "type": "string", "required": false, "public": true },
+        { "name": "pages", "type": "string", "required": false, "public": true },
+        { "name": "editorial_status", "type": "string", "required": false, "public": true },
+        { "name": "benefit", "type": "text", "required": false, "public": true },
+        { "name": "caution", "type": "text", "required": false, "public": true },
+        { "name": "rights_note", "type": "text", "required": false, "public": true },
+        { "name": "topics", "type": "json", "required": true, "default": [], "public": true },
+        { "name": "featured", "type": "boolean", "required": true, "default": false, "public": true },
+        { "name": "access_label", "type": "string", "required": false, "public": true },
+        { "name": "additional_links", "type": "json", "required": true, "default": [], "public": true },
+        { "name": "public_url", "type": "string", "required": false, "public": true },
+        { "name": "alternative_url", "type": "string", "required": false, "public": true },
+        { "name": "public_link_status", "type": "enum", "enum": "link_status", "required": true, "default": "hidden_pending_permission" },
+        { "name": "medical_review_status", "type": "enum", "enum": "medical_review_status", "required": true, "default": "pending", "public": true },
+        { "name": "rights_status", "type": "enum", "enum": "rights_status", "required": true, "default": "pending" },
+        { "name": "last_checked_at", "type": "date", "required": false, "public": true },
+        { "name": "archived", "type": "boolean", "required": true, "default": false }
+      ],
+      "indexes": [
+        { "fields": ["library_id"], "unique": true },
+        { "fields": ["slug"], "unique": true }
+      ]
+    },
+    {
+      "name": "pages",
+      "label": "Страницы",
+      "versioning": true,
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "page_id", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "slug", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "title", "type": "string", "required": true, "public": true },
+        { "name": "summary", "type": "text", "required": false, "public": true },
+        { "name": "body", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true },
+        { "name": "workflow_status", "type": "enum", "enum": "workflow_status", "required": true, "default": "draft" },
+        { "name": "template_key", "type": "string", "required": true, "immutable": true },
+        { "name": "public_updated_at", "type": "date", "required": false, "public": true }
+      ]
+    },
+    {
+      "name": "navigation",
+      "label": "Навигация",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "label", "type": "string", "required": true, "public": true },
+        { "name": "href", "type": "string", "required": true, "public": true },
+        { "name": "placement", "type": "string", "required": true, "public": true },
+        { "name": "sort_order", "type": "integer", "required": true, "public": true },
+        { "name": "parent", "type": "relation", "required": false, "relation": { "kind": "many-to-one", "target": "navigation", "onDelete": "restrict" } },
+        { "name": "enabled", "type": "boolean", "required": true, "default": true, "public": true }
+      ]
+    },
+    {
+      "name": "site_settings",
+      "label": "Настройки проекта",
+      "singleton": true,
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "project_name", "type": "string", "required": true, "public": true },
+        { "name": "canonical_origin", "type": "string", "required": true, "public": true },
+        { "name": "editor_email", "type": "string", "required": true, "public": true },
+        { "name": "owner_name", "type": "string", "required": true, "public": true },
+        { "name": "owner_status", "type": "string", "required": true, "public": true },
+        { "name": "owner_location", "type": "string", "required": true, "public": true },
+        { "name": "partner_name", "type": "string", "required": false, "public": true },
+        { "name": "partner_url", "type": "string", "required": false, "public": true },
+        { "name": "mission", "type": "text", "format": "sanitized_rich_text", "required": true, "public": true },
+        { "name": "medical_review_required_risks", "type": "json", "required": true, "default": ["high"], "description": "Уровни риска, для которых медицинская проверка обязательна перед выпуском." }
+      ]
+    },
+    {
+      "name": "media_metadata",
+      "label": "Сведения о медиа",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "file", "type": "relation", "required": true, "unique": true, "relation": { "kind": "one-to-one", "target": "directus_files", "onDelete": "restrict" } },
+        { "name": "sha256", "type": "string", "format": "sha256", "maxLength": 64, "required": true, "immutable": true, "public": true, "reviewed": true },
+        { "name": "mime_type", "type": "string", "required": true, "immutable": true },
+        { "name": "byte_size", "type": "integer", "required": true, "immutable": true },
+        { "name": "width", "type": "integer", "required": false, "immutable": true },
+        { "name": "height", "type": "integer", "required": false, "immutable": true },
+        { "name": "alt_text", "type": "text", "required": true, "public": true, "reviewed": true },
+        { "name": "caption", "type": "text", "required": false, "public": true, "reviewed": true },
+        { "name": "author_or_source", "type": "string", "required": true, "public": true, "reviewed": true },
+        { "name": "rights_basis", "type": "text", "required": true },
+        { "name": "rights_status", "type": "enum", "enum": "rights_status", "required": true, "default": "pending" },
+        { "name": "security_status", "type": "enum", "enum": "media_security_status", "required": true, "default": "pending" },
+        { "name": "security_checked_at", "type": "datetime", "required": false },
+        { "name": "security_findings", "type": "json", "required": true, "default": [] },
+        { "name": "uploaded_by", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users" } }
+      ],
+      "indexes": [
+        { "fields": ["sha256"], "unique": false }
+      ]
+    },
+    {
+      "name": "review_assignments",
+      "label": "Назначения на проверку",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "reviewer", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users", "onDelete": "restrict" } },
+        { "name": "version", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_versions", "onDelete": "restrict" } },
+        { "name": "status", "type": "enum", "enum": "assignment_status", "required": true, "default": "assigned" },
+        { "name": "assigned_by", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users" } },
+        { "name": "assigned_at", "type": "datetime", "required": true },
+        { "name": "completed_at", "type": "datetime", "required": false }
+      ]
+    },
+    {
+      "name": "medical_reviews",
+      "label": "Медицинские проверки",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "restrict" } },
+        { "name": "version", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_versions", "onDelete": "restrict" } },
+        { "name": "fingerprint", "type": "string", "format": "sha256", "maxLength": 64, "required": true, "immutable": true },
+        { "name": "reviewer", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users", "onDelete": "restrict" } },
+        { "name": "reviewer_name", "type": "string", "required": true, "immutable": true, "public": true },
+        { "name": "reviewer_specialty", "type": "string", "required": true, "immutable": true, "public": true },
+        { "name": "reviewer_profile_url", "type": "string", "required": false, "immutable": true, "public": true },
+        { "name": "decision", "type": "enum", "enum": "review_decision", "required": true, "immutable": true },
+        { "name": "comment", "type": "text", "required": false, "immutable": true },
+        { "name": "reviewed_at", "type": "datetime", "required": true, "immutable": true, "public": true },
+        { "name": "evidence_reference", "type": "string", "required": true, "immutable": true },
+        { "name": "owner_confirmed_by", "type": "relation", "required": false, "relation": { "kind": "many-to-one", "target": "directus_users" } },
+        { "name": "owner_confirmed_at", "type": "datetime", "required": false }
+      ],
+      "indexes": [
+        { "fields": ["material", "fingerprint", "decision"] }
+      ]
+    },
+    {
+      "name": "editorial_comments",
+      "label": "Редакционные замечания",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "material", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "materials", "onDelete": "cascade" } },
+        { "name": "version", "type": "relation", "required": false, "relation": { "kind": "many-to-one", "target": "directus_versions", "onDelete": "restrict" } },
+        { "name": "author", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users", "onDelete": "restrict" } },
+        { "name": "body", "type": "text", "required": true },
+        { "name": "resolved", "type": "boolean", "required": true, "default": false },
+        { "name": "created_at", "type": "datetime", "required": true }
+      ]
+    },
+    {
+      "name": "release_requests",
+      "label": "Запросы выпуска",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "requested_by", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users", "onDelete": "restrict" } },
+        { "name": "requested_at", "type": "datetime", "required": true, "immutable": true },
+        { "name": "status", "type": "enum", "enum": "release_status", "required": true, "default": "queued" },
+        { "name": "material_ids", "type": "json", "required": false, "immutable": true },
+        { "name": "attempt_count", "type": "integer", "required": true, "default": 0 },
+        { "name": "last_error_code", "type": "string", "required": false },
+        { "name": "last_error_summary", "type": "text", "required": false }
+      ]
+    },
+    {
+      "name": "releases",
+      "label": "Выпуски",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "release_id", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "request", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "release_requests", "onDelete": "restrict" } },
+        { "name": "status", "type": "enum", "enum": "release_status", "required": true, "immutable": true, "public": true },
+        { "name": "source_commit", "type": "string", "required": true, "immutable": true, "public": true },
+        { "name": "snapshot_id", "type": "string", "required": true, "immutable": true, "public": true },
+        { "name": "snapshot_sha256", "type": "string", "format": "sha256", "maxLength": 64, "required": true, "immutable": true, "public": true },
+        { "name": "archive_sha256", "type": "string", "format": "sha256", "maxLength": 64, "required": false, "immutable": true, "public": true },
+        { "name": "previous_release_id", "type": "string", "required": false, "immutable": true, "public": true },
+        { "name": "routes", "type": "json", "required": true, "immutable": true, "public": true },
+        { "name": "material_versions", "type": "json", "required": true, "immutable": true },
+        { "name": "built_at", "type": "datetime", "required": true, "immutable": true, "public": true },
+        { "name": "activated_at", "type": "datetime", "required": false, "immutable": true, "public": true },
+        { "name": "verification_result", "type": "json", "required": true, "immutable": true }
+      ],
+      "indexes": [
+        { "fields": ["release_id"], "unique": true }
+      ]
+    },
+    {
+      "name": "redirects",
+      "label": "Перенаправления",
+      "fields": [
+        { "name": "id", "type": "uuid", "primaryKey": true, "required": true, "unique": true, "immutable": true },
+        { "name": "from_path", "type": "string", "required": true, "unique": true, "immutable": true, "public": true },
+        { "name": "to_path", "type": "string", "required": true, "public": true },
+        { "name": "status", "type": "enum", "enum": "redirect_status", "required": true, "default": "active" },
+        { "name": "created_by", "type": "relation", "required": true, "relation": { "kind": "many-to-one", "target": "directus_users" } },
+        { "name": "created_at", "type": "datetime", "required": true }
+      ]
+    }
+  ],
+  "invariants": [
+    {
+      "id": "high-risk-review-required",
+      "description": "Материал высокого риска нельзя подготовить к публикации или опубликовать без действующей медицинской рецензии той же версии.",
+      "collections": ["materials", "medical_reviews"]
+    },
+    {
+      "id": "review-invalidated-on-public-change",
+      "description": "Изменение данных, включённых в reviewFingerprint, переводит материал в revision_required.",
+      "collections": ["materials", "material_blocks", "sources", "media_metadata"]
+    },
+    {
+      "id": "single-active-owner-minimum",
+      "description": "В системе всегда остаётся хотя бы один активный владелец.",
+      "collections": ["directus_users"]
+    },
+    {
+      "id": "published-library-links-approved",
+      "description": "В публичный снимок попадают только разрешённые библиотечные ссылки.",
+      "collections": ["library_items"]
+    },
+    {
+      "id": "media-security-required",
+      "description": "В публичный снимок попадают только медиа с проверенной сигнатурой, безопасным SVG и заполненными сведениями о правах.",
+      "collections": ["media_metadata", "directus_files"]
+    },
+    {
+      "id": "release-snapshot-immutable",
+      "description": "После начала сборки содержимое снимка и его контрольная сумма не изменяются.",
+      "collections": ["release_requests", "releases"]
+    }
+  ]
+}

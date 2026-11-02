@@ -1,0 +1,157 @@
+/* =========================================================================
+   ДиарВики · стандарт «Blueprint» · общий CSS
+   Положить в site/src/styles/blueprint.css и подключить ПОСЛЕ tokens.css.
+   Значения взяты из эталона reference/*.html — не округлять, не «улучшать».
+   ========================================================================= */
+
+/* ---------- 1. Токены ---------- */
+:root {
+  --dw-blue: #1D45D8;
+  --dw-blue-deep: #0E2A8A;
+  --dw-paper: #F4F3EE;
+  --dw-white: #FFFFFF;
+  --dw-ink: #0B1A44;
+  --dw-muted: #4A5578;
+  --dw-signal: #FF5B1F;
+  --dw-signal-ink: #10131F;
+  --dw-line: rgb(29 69 216 / 30%);
+  --dw-line-on-blue: rgb(255 255 255 / 45%);
+  --dw-dash-on-blue: rgb(255 255 255 / 65%);
+
+  --dw-font-display: 'Inter Tight Variable', 'Inter Tight', system-ui, sans-serif;
+  --dw-font-text: 'Golos Text Variable', 'Golos Text', system-ui, sans-serif;
+  --dw-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  --dw-pad: clamp(20px, 5vw, 72px);
+  --dw-section: clamp(96px, 12vw, 168px);
+  --dw-content: 1320px;
+  --dw-reading: 760px;
+
+  --dw-ease: cubic-bezier(.2, .8, .2, 1);
+
+  /* Короткие имена, как в эталоне (inline-стили эталона используют их) */
+  --b: var(--dw-blue);
+  --bd: var(--dw-blue-deep);
+  --o: var(--dw-signal);
+  --paper: var(--dw-paper);
+  --ink: var(--dw-ink);
+  --muted: var(--dw-muted);
+  --line: var(--dw-line);
+  --pad: var(--dw-pad);
+
+  /* Временные псевдонимы старых токенов — удалить после перехода */
+  --navy: var(--dw-blue);
+  --navy-deep: var(--dw-blue-deep);
+  --brand: var(--dw-blue);
+  --aqua: var(--dw-blue);
+  --aqua-dark: var(--dw-blue);
+  --sky: var(--dw-paper);
+  --mist: var(--dw-paper);
+  --ink-muted: var(--dw-muted);
+  --white: var(--dw-white);
+}
+
+/* ---------- 2. База ---------- */
+html { background: var(--dw-paper); }
+body {
+  margin: 0;
+  background: var(--dw-paper);
+  color: var(--dw-ink);
+  font-family: var(--dw-font-text);
+  line-height: 1.6;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--dw-signal);
+  outline-offset: 3px;
+}
+.dw-container { box-sizing: border-box; width: 100%; min-width: 0; max-width: var(--dw-content); margin: 0 auto; padding: 0 var(--dw-pad); }
+.dw-label {
+  font-family: var(--dw-font-mono);
+  font-size: 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- 3. Стрелки и строки-ссылки ---------- */
+.arrow { display: inline-block; transition: transform 220ms cubic-bezier(.2, .7, .2, 1); }
+.row-link { transition: background-color 200ms ease-out; }
+.row-link:hover { background-color: rgb(29 69 216 / 5%); }
+.on-blue .row-link:hover { background-color: rgb(255 255 255 / 7%); }
+.row-link:hover .arrow, .cell:hover .arrow, .foot-link:hover .arrow { transform: translate(4px, -4px); }
+
+/* ---------- 4. Иконки: прорисовка при наведении ----------
+   У каждого path/circle/rect внутри svg.ico обязателен атрибут pathLength="1". */
+.ico path, .ico circle, .ico rect { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.icon-host:hover .ico path, .icon-host:hover .ico circle, .icon-host:hover .ico rect {
+  animation: dw-redraw 700ms cubic-bezier(.4, 0, .2, 1);
+}
+@keyframes dw-redraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ---------- 5. Папки-маршруты (главная) ---------- */
+.folder { position: relative; display: block; height: 400px; text-decoration: none; color: #FFFFFF; perspective: 1200px; }
+.folder:is(:hover, :focus-visible) { color: var(--dw-white); }
+.folder-back { position: absolute; inset: 28px 0 0 0; background: var(--dw-blue-deep); }
+.folder-tab {
+  position: absolute; top: 0; left: 0; height: 30px; padding: 0 18px;
+  display: flex; align-items: center; background: var(--dw-blue-deep);
+  font-family: var(--dw-font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+}
+.folder-sheet {
+  position: absolute; left: 18px; right: 18px; top: 48px; height: 240px;
+  background: #FFFFFF; color: var(--dw-ink); padding: 18px;
+  display: flex; flex-direction: column; gap: 9px;
+  transition: transform 420ms var(--dw-ease);
+}
+.folder-front {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 268px;
+  background: var(--dw-blue); color: var(--dw-white); padding: 28px;
+  display: flex; flex-direction: column; gap: 12px;
+  transform-origin: 50% 100%;
+  transition: transform 420ms var(--dw-ease), box-shadow 420ms ease;
+}
+.folder:hover .folder-sheet, .folder:focus-visible .folder-sheet { transform: translateY(-44px); }
+.folder:hover .folder-front, .folder:focus-visible .folder-front {
+  transform: rotateX(-14deg) translateY(6px);
+  box-shadow: 0 -1px 0 rgb(255 255 255 / 35%) inset;
+}
+.folder:hover .arrow { transform: translate(4px, -4px); }
+
+/* ---------- 6. Мобильная шапка и сетки (≤ 760 px) ---------- */
+.burger { display: none; }
+@media (max-width: 760px) {
+  .nav-desktop { display: none !important; }
+  .burger { display: grid !important; }
+  .topbar-1 { display: none; }
+  .search-btn { display: none !important; }
+  .header-inner { flex-wrap: nowrap !important; gap: 12px !important; min-height: 64px !important; }
+  .brand-name { font-size: 20px !important; }
+  .hero-submit { padding: 0 18px !important; }
+  .hero-submit-text { display: none; }
+  .passport { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .passport > div { padding: 24px 16px 24px 0 !important; border-right: 0 !important; border-bottom: 1px solid var(--dw-line); }
+}
+
+/* ---------- 7. Анимации (только если пользователь не просил «меньше движения») ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal { animation: dw-rise linear both; animation-timeline: view(); animation-range: entry 0% cover 22%; }
+    .wordmark { animation: dw-rise-big linear both; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+    @media (hover: none) {
+      .folder .folder-sheet { animation: dw-pull linear both; animation-timeline: view(); animation-range: cover 25% cover 55%; }
+    }
+  }
+  /* Блюпринт в первом экране прорисовывается один раз */
+  .bp .ln { stroke-dasharray: 1; stroke-dashoffset: 1; animation: dw-draw 1600ms cubic-bezier(.4, 0, .2, 1) 200ms forwards; }
+  .bp .ln.l2 { animation-delay: 500ms; }
+  .bp .ln.l3 { animation-delay: 800ms; }
+  .bp .labels { opacity: 0; animation: dw-fade 600ms ease-out 1500ms forwards; }
+  .bp .dot { animation: dw-ping 1800ms ease-out 1800ms 3; }
+}
+@keyframes dw-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes dw-rise-big { from { transform: translateY(40%); } to { transform: none; } }
+@keyframes dw-pull { from { transform: none; } to { transform: translateY(-44px); } }
+@keyframes dw-draw { to { stroke-dashoffset: 0; } }
+@keyframes dw-fade { to { opacity: 1; } }
+@keyframes dw-ping { 0% { r: 3; opacity: 1; } 70% { r: 12; opacity: 0; } 100% { r: 3; opacity: 1; } }

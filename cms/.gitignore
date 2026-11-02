@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+compose.override.yaml
+
+runtime/
+data/
+uploads/
+backups/
+snapshots/
+tmp/
+node_modules/
+dist/
+
+*.log
+*.pid
+

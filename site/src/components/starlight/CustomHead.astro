@@ -1,0 +1,33 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import YandexMetrikaHead from '../analytics/YandexMetrikaHead.astro';
+import { siteIdentity } from '../../config/site';
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': 'https://diarwiki.ru/#owner',
+      name: siteIdentity.owner.name,
+      url: `${siteIdentity.origin}/about/`,
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://diarwiki.ru/#website',
+      url: 'https://diarwiki.ru/',
+      name: 'ДиарВики',
+      inLanguage: 'ru-RU',
+      publisher: { '@id': 'https://diarwiki.ru/#owner' },
+    },
+  ],
+};
+const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED !== 'false';
+const previewBuild = import.meta.env.PUBLIC_PREVIEW_BUILD === 'true';
+---
+
+<Default />
+{previewBuild && <meta name="robots" content="noindex,nofollow" />}
+{previewBuild && <meta name="referrer" content="no-referrer" />}
+<script type="application/ld+json" set:html={JSON.stringify(graph)} />
+{analyticsEnabled && <YandexMetrikaHead />}

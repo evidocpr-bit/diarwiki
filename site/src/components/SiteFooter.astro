@@ -1,0 +1,42 @@
+---
+import { footerInformationNavigation, footerLegalNavigation, routePaths, siteIdentity, siteRoutes } from '../config/site';
+import Icon from './Icon.astro';
+const siteLinks = siteRoutes.filter((route) => ['knowledge', 'library', 'glucoseTool'].includes(route.key));
+const editorialLinks = footerInformationNavigation.filter((route) => ['editorialPolicy', 'reviewStatus', 'sources'].includes(route.key));
+const legalLinks = footerLegalNavigation;
+---
+<footer class="site-footer on-blue">
+  <div class="dw-container">
+    <div class="footer-intro">
+      <div class="footer-about"><span class="footer-title">ДиарВики © {new Date().getFullYear()}</span><p>Справочник для взрослых с диабетом 1 типа и их близких. Помогает найти объяснение, понять его границы и подготовить вопрос врачу.</p></div>
+      <div class="footer-partner"><span class="footer-label">Экспертный партнёр</span><a href={siteIdentity.evidoc.url} rel="external">{siteIdentity.evidoc.name} <span class="arrow" aria-hidden="true">↗</span></a><p>Врачи клиники могут рецензировать отдельные материалы. Имя и дата указываются только после проверки конкретной версии.</p></div>
+    </div>
+    <div class="footer-links">
+      <nav aria-label="Сайт"><h2>Сайт:</h2>{siteLinks.map((route) => <a class="foot-link" href={route.href}>{route.label}<span class="arrow" aria-hidden="true">↗</span></a>)}</nav>
+      <nav aria-label="Редакция"><h2>Редакция:</h2>{editorialLinks.map((route) => <a class="foot-link" href={route.href}>{route.label}<span class="arrow" aria-hidden="true">↗</span></a>)}<a class="foot-link" href={routePaths.contact}>Сообщить о неточности<span class="arrow" aria-hidden="true">↗</span></a></nav>
+      <nav aria-label="Правила"><h2>Правила:</h2>{legalLinks.map((route) => <a class="foot-link" href={route.href}>{route.key === 'medicalDisclaimer' ? 'Медицинское предупреждение' : route.label}<span class="arrow" aria-hidden="true">↗</span></a>)}</nav>
+    </div>
+    <div class="footer-social" aria-label="Контакты и навигация"><a class="icon-host" href="https://t.me/menthol_six" target="_blank" rel="noopener noreferrer" aria-label="Telegram Степана — @menthol_six" title="Telegram: @menthol_six"><Icon name="telegram" size={32} /></a><a class="icon-host" href={`mailto:${siteIdentity.editorEmail}`} aria-label="Написать редакции"><Icon name="mail" size={32} /></a><a class="icon-host" href="#top" aria-label="Наверх"><Icon name="up" size={32} /></a></div>
+    <div aria-hidden="true" class="wordmark">ДиарВики</div>
+    <div class="footer-bottom"><span>{siteIdentity.owner.shortName} · физическое лицо · г. Хабаровск</span><span>Материалы не заменяют консультацию врача · 112</span></div>
+  </div>
+</footer>
+<style>
+  .site-footer { width: 100%; min-width: 0; }
+  .footer-intro > *, .footer-links > *, .footer-social > *, .footer-bottom > * { min-width: 0; }
+  .site-footer{overflow:hidden;background:var(--dw-blue);color:var(--dw-white)}.footer-intro{display:flex;flex-wrap:wrap;justify-content:space-between;gap:40px;padding:80px 0 56px;border-bottom:1px solid var(--dw-line-on-blue)}.footer-about{flex:1 1 360px;display:flex;flex-direction:column;gap:20px}.footer-title{font:600 26px/1.2 var(--dw-font-display)}.footer-about p{max-width:30rem;margin:0;font:400 14px/1.9 var(--dw-font-mono)}.footer-partner{flex:0 1 380px;display:flex;flex-direction:column;gap:10px;color:rgb(255 255 255 / 84%);font-size:14px;line-height:1.55}.footer-label{color:white;font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.footer-partner>a{color:white;font:600 20px/1.3 var(--dw-font-display);text-decoration:none}.footer-partner p{margin:0}.footer-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 56px;padding:56px 0;border-bottom:1px solid var(--dw-line-on-blue)}.footer-links nav{display:flex;flex-direction:column}.footer-links h2{margin:0 0 14px;color:white;font:600 24px/1.2 var(--dw-font-display)}.foot-link{display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px dashed rgb(255 255 255 / 65%);color:white;font:400 13px/1.45 var(--dw-font-mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none}.footer-social{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-bottom:1px solid var(--dw-line-on-blue)}.footer-social a{height:112px;display:grid;place-items:center;border-right:1px solid var(--dw-line-on-blue);color:white;text-decoration:none}.wordmark{padding:40px 0 12px;color:white;font:700 clamp(64px,15.5vw,236px)/.9 var(--dw-font-display);letter-spacing:-.055em;white-space:nowrap}.footer-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;padding:22px 0 32px;border-top:1px solid var(--dw-line-on-blue);color:rgb(255 255 255 / 85%);font:400 11px/1.5 var(--dw-font-mono);letter-spacing:.12em;text-transform:uppercase}
+  @media(max-width:760px){.footer-links{grid-template-columns:1fr;gap:32px;padding:36px 0}.footer-intro{padding:48px 0 36px}.footer-social{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.wordmark{font-size:15.5vw}.footer-bottom{flex-direction:column}}
+  @media (max-width: 760px) {
+    .footer-intro { gap: 28px; }
+    .footer-about { flex-basis: 100%; gap: 14px; }
+    .footer-about p { font-size: 12px; line-height: 1.75; }
+    .footer-partner { flex-basis: 100%; }
+    .footer-links { gap: 28px; }
+    .foot-link { font-size: 12px; letter-spacing: .07em; overflow-wrap: anywhere; }
+    .footer-social { width: calc(100% + 2 * var(--dw-pad)); margin-inline: calc(-1 * var(--dw-pad)); grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--dw-line-on-blue); }
+    .footer-social a { height: 80px; }
+    .footer-social a:last-child { border-right: 0; }
+    .footer-bottom { font-size: 10px; letter-spacing: .07em; line-height: 1.65; }
+    .wordmark { padding-top: 28px; }
+  }
+</style>

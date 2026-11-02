@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLibraryResources, libraryCategories } from '../../lib/library';
+import { siteIdentity } from '../../config/site';
+
+const resources = getLibraryResources();
+const collectionSchema = {
+  '@context': 'https://schema.org', '@type': 'CollectionPage', '@id': `${siteIdentity.origin}/library/#collection`,
+  url: `${siteIdentity.origin}/library/`, name: 'Что открывать и зачем',
+  description: 'Каталог книг, руководств, школ диабета, приложений и инструкций сообщества.', inLanguage: 'ru-RU',
+  isPartOf: { '@id': `${siteIdentity.origin}/#website` },
+  mainEntity: { '@type': 'ItemList', numberOfItems: resources.length, itemListElement: resources.map((resource, index) => ({ '@type': 'ListItem', position: index + 1, name: resource.title, url: `${siteIdentity.origin}${resource.href}` })) },
+};
+const userResource = (resource: (typeof resources)[number]) => resource.category.id === 'communities' || /пользователь/u.test(resource.resourceType.toLocaleLowerCase('ru'));
+const languageLabel = (value: string) => value.toLocaleLowerCase('ru').split(/[;,/]/u).map((part) => part.trim()).filter(Boolean).map((part) => ({ русский: 'RU', английский: 'EN', мульти: 'МУЛЬТИ' }[part] ?? part.toUpperCase())).join('/') || '—';
+const categoryLabel = (categoryId: string, shortLabel: string) => categoryId === 'education' ? 'Школы и видео' : categoryId === 'communities' ? 'Сообщества' : categoryId === 'quick-reads' ? 'Памятки' : shortLabel;
+---
+<BaseLayout title="Библиотека — что открывать и зачем" description="Каталог книг, исследований, школ, приложений и пользовательских инструкций с разбором пользы, ограничений и законного способа доступа." canonicalPath="/library/">
+  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+  <section style="border-bottom:1px solid var(--b)">
+    <div class="dw-container library-hero" style="display:flex;flex-wrap:wrap">
+      <div class="catalog-spine"><span>Каталог чтения · {new Date().getFullYear()}</span><span aria-hidden="true">[↓]</span></div>
+      <div class="library-title">
+        <span class="dw-label" style="color:var(--b)">Библиотека · {resources.length} ресурсов</span>
+        <h1>Что открывать<br /> и зачем</h1>
+        <p>Книги, руководства, школы, приложения и инструкции сообщества. У каждого — польза, ограничения и законный способ доступа.</p>
+      </div>
+      <aside class="library-note"><span class="dw-label" style="font-size:11px;color:var(--b)">Это каталог, а не хранилище</span><p>Сайт ведёт к официальному или исходному ресурсу. Файлы и чужие изображения не перезаливаются без разрешения правообладателя.</p></aside>
+    </div>
+  </section>
+
+  <section aria-label="Каталог" style="padding:40px 0 96px">
+    <div class="dw-container" style="display:flex;flex-direction:column;gap:24px">
+      <div class="filter-row">
+        <div class="filter-buttons" role="group" aria-label="Категории">
+          <button type="button" aria-pressed="true" data-filter="all">Все <span>{resources.length}</span></button>
+          {libraryCategories.map((category) => <button type="button" aria-pressed="false" data-filter={category.id}>{categoryLabel(category.id, category.shortLabel)} <span>{resources.filter((resource) => resource.category.id === category.id).length}</span></button>)}
+        </div>
+        <label class="catalog-search" for="library-search"><span aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></span><span class="sr-only">Поиск по библиотеке</span><input id="library-search" type="search" placeholder="Название, автор, тема" autocomplete="off" /></label>
+      </div>
+      <div class="table-scroll">
+        <div role="table" aria-label="Ресурсы библиотеки" class="resource-table">
+          <div role="row" class="resource-columns"><span role="columnheader">№</span><span role="columnheader">Название</span><span role="columnheader">Тип</span><span role="columnheader">Язык</span><span role="columnheader">Год</span><span role="columnheader"><span class="sr-only">Открыть</span></span></div>
+          {resources.map((resource) => <a role="row" class="resource-row row-link" href={resource.href} data-library-card data-category={resource.category.id} data-search={`${resource.id} ${resource.title} ${resource.authors} ${resource.resourceType} ${resource.topics.join(' ')}`.toLocaleLowerCase('ru')}>
+            <span role="cell" class="resource-id">{resource.id}</span>
+            <span role="cell" class="resource-title"><strong>{resource.title}{userResource(resource) ? ' *' : ''}</strong><span class="resource-summary">{resource.summary}</span><span class="resource-mobile-meta">{resource.resourceType} · {languageLabel(resource.language)} · {resource.year || '—'}</span></span>
+            <span role="cell" class="resource-type">{resource.resourceType}</span>
+            <span role="cell" class="resource-language">{languageLabel(resource.language)}</span>
+            <span role="cell" class="resource-year">{resource.year || '—'}</span>
+            <span role="cell" aria-hidden="true" class="resource-arrow arrow">↗</span>
+          </a>)}
+        </div>
+      </div>
+      <p class="resource-legend">Показано: <span data-testid="library-count" aria-live="polite">{resources.length} из {resources.length}</span><span class="resource-asterisk">Звёздочкой * отмечены пользовательские способы — это не официальные инструкции.</span></p>
+      <p class="empty-state" data-library-empty hidden>Ничего не нашлось. Попробуйте название темы, автора или приложения без сокращений.</p>
+    </div>
+  </section>
+  <script>
+    const search = document.querySelector('#library-search');
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-library-card]'));
+    const count = document.querySelector('[data-testid="library-count"]');
+    const empty = document.querySelector('[data-library-empty]');
+    let activeCategory = 'all';
+    const updateCatalog = () => {
+      const query = search instanceof HTMLInputElement ? search.value.trim().toLocaleLowerCase('ru') : '';
+      let visible = 0;
+      cards.forEach((card) => {
+        const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+        const matchesSearch = (card.dataset.search ?? '').includes(query);
+        card.hidden = !(matchesCategory && matchesSearch);
+        if (!card.hidden) visible += 1;
+      });
+      if (count) count.textContent = `${visible} из ${cards.length}`;
+      if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+    };
+    search?.addEventListener('input', updateCatalog);
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      activeCategory = button.dataset.filter ?? 'all';
+      buttons.forEach((item) => {
+        const active = item === button;
+        item.setAttribute('aria-pressed', String(active));
+        item.classList.toggle('is-active', active);
+      });
+      updateCatalog();
+    }));
+  </script>
+</BaseLayout>
+<style>
+  .resource-mobile-meta { display: none; }
+  .table-scroll, .filter-row, .filter-buttons, .catalog-search { min-width: 0; max-width: 100%; }
+  .table-scroll { width: 100%; }
+  .resource-summary { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .filter-buttons button[data-filter] span { opacity: 1; }
+  .library-hero{position:relative;min-height:292px;align-items:stretch;border-bottom:0}.catalog-spine{flex:0 0 88px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:24px 0;background:var(--b);color:#fff}.catalog-spine span:first-child{writing-mode:vertical-rl;transform:rotate(180deg);font:400 11px/1.3 var(--dw-font-mono);letter-spacing:.2em;text-transform:uppercase}.catalog-spine span:last-child{font:400 22px/1 var(--dw-font-mono)}.library-title{flex:1 1 520px;min-width:0;padding:56px 40px 48px;display:flex;flex-direction:column;gap:20px}.library-title h1{margin:0;font:600 clamp(40px,5vw,72px)/.98 var(--dw-font-display);letter-spacing:-.035em;color:var(--b)}.library-title p{max-width:36rem;margin:0;font-size:18px;line-height:1.55}.library-note{flex:1 1 280px;min-width:0;border-left:1px solid var(--b);padding:56px 0 48px 32px;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.5}.library-note p{margin:0}.filter-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.filter-buttons{display:flex;flex-wrap:wrap;border-top:1px solid var(--b);border-left:1px solid var(--b)}.filter-buttons button{min-height:44px;padding:0 16px;border:0;border-right:1px solid var(--b);border-bottom:1px solid var(--b);background:transparent;color:var(--b);font:400 12px/1.3 var(--dw-font-mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}.filter-buttons button span{opacity:.75}.filter-buttons button[aria-pressed="true"],.filter-buttons button:hover{background:var(--b);color:#fff}.catalog-search{display:flex;align-items:center;gap:10px;min-width:260px;border-bottom:1px solid var(--b);padding:6px 0;color:var(--b)}.catalog-search input{flex:1;min-width:0;height:32px;border:0;background:transparent;color:var(--ink);font:400 16px/1.4 var(--dw-font-text)}.table-scroll{overflow-x:auto;border-top:1px solid var(--b)}.resource-table{min-width:760px}.resource-columns,.resource-row{display:grid;grid-template-columns:96px minmax(0,1fr) 200px 96px 72px 32px;gap:16px}.resource-columns{padding:12px 8px;border-bottom:1px solid var(--b);color:var(--muted);font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.resource-row{align-items:baseline;padding:16px 8px;border-bottom:1px dashed var(--line);color:var(--ink);text-decoration:none}.resource-row[hidden]{display:none}.resource-id{color:var(--b);font:400 13px/1.4 var(--dw-font-mono)}.resource-title{display:flex;flex-direction:column;gap:4px}.resource-title strong{font:600 19px/1.2 var(--dw-font-display);letter-spacing:-.01em}.resource-title>span{color:var(--muted);font-size:14px;line-height:1.4}.resource-type{color:var(--muted);font-size:14px}.resource-language,.resource-year{font:400 12px/1.4 var(--dw-font-mono);text-transform:uppercase}.resource-arrow{color:var(--b);font-size:18px}.resource-legend{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;color:var(--muted);font:400 11px/1.5 var(--dw-font-mono);letter-spacing:.12em;text-transform:uppercase}.resource-asterisk{letter-spacing:.08em}.empty-state{padding:32px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+  @media(max-width:760px){.library-hero{min-height:0}.catalog-spine{flex-basis:56px;padding:18px 0}.library-title{flex-basis:calc(100% - 56px);padding:28px 0 28px 20px}.library-title h1{font-size:clamp(40px,12vw,56px)}.library-title p{font-size:16px}.library-note{flex-basis:100%;margin-left:56px;padding:18px 0 24px 20px;border-left:1px solid var(--b);border-top:1px solid var(--b)}.filter-row{align-items:stretch}.filter-buttons{flex-wrap:nowrap;overflow-x:auto;max-width:100%}.filter-buttons button{white-space:nowrap}.catalog-search{width:100%}.resource-legend{flex-direction:column}}
+  @media (max-width: 760px) {
+    .filter-buttons { flex: 1 1 100%; width: 100%; }
+    .catalog-search { min-width: 0; }
+    .library-note { flex-basis: calc(100% - 56px); }
+    .library-title h1 { font-size: clamp(32px, 9vw, 46px); line-height: 1.04; text-wrap: pretty; }
+    .library-title p { font-size: 16px; line-height: 1.55; }
+    .resource-table { min-width: 0; width: 100%; }
+    .resource-columns, .resource-row { grid-template-columns: 56px minmax(0, 1fr) 16px; gap: 10px; }
+    .resource-columns > :nth-child(n + 3) { display: none; }
+    .resource-row { padding: 18px 0; align-items: start; }
+    .resource-type, .resource-language, .resource-year { display: none; }
+    .resource-id { font-size: 10px; padding-top: 3px; }
+    .resource-title { min-width: 0; gap: 8px; }
+    .resource-title strong { font-size: 18px; line-height: 1.2; }
+    .resource-summary { -webkit-line-clamp: 3; font-size: 14px; line-height: 1.5; }
+    .resource-title > .resource-mobile-meta { display: block; color: var(--dw-blue); font: 400 10px/1.5 var(--dw-font-mono); letter-spacing: .03em; }
+    .resource-legend { font-size: 10px; letter-spacing: .06em; line-height: 1.6; }
+    .resource-legend > span { min-width: 0; }
+  }
+</style>

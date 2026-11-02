@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Перевод единиц глюкозы" description="Локальный арифметический перевод между ммоль/л и мг/дл. Введённое значение не отправляется на сервер.">
+  <section class="tool-hero">
+    <div class="container tool-grid">
+      <div>
+        <p class="eyebrow">Инструмент</p>
+        <h1>ммоль/л ↔ мг/дл</h1>
+        <p>Простой перевод единиц для чтения материалов и показаний. Это не интерпретация результата и не расчёт лечения.</p>
+      </div>
+      <form class="converter" data-converter>
+        <label for="glucose-value">Значение</label>
+        <input id="glucose-value" name="value" type="text" inputmode="decimal" placeholder="Например, 5,6" autocomplete="off" />
+        <fieldset>
+          <legend>Направление перевода</legend>
+          <label><input type="radio" name="direction" value="mmol-to-mgdl" checked /> ммоль/л → мг/дл</label>
+          <label><input type="radio" name="direction" value="mgdl-to-mmol" /> мг/дл → ммоль/л</label>
+        </fieldset>
+        <button class="button" type="submit">Перевести</button>
+        <output class="result" aria-live="polite" data-result>Введите число больше нуля.</output>
+      </form>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container explanation">
+      <h2>Как выполняется перевод</h2>
+      <p>Для справочного пересчёта используется коэффициент молярной массы глюкозы: приблизительно 18,0182. Результат из ммоль/л округляется до целого мг/дл, а обратный результат — до одной десятой ммоль/л.</p>
+      <p class="privacy">Все вычисления происходят в вашем браузере. «ДиарВики» не получает и не сохраняет введённое значение.</p>
+      <div class="notice"><strong>Важно.</strong> Число само по себе не определяет диагноз, цель лечения или необходимое действие. Используйте диапазоны и план, которые согласованы с врачом.</div>
+    </div>
+  </section>
+  <script>
+    import { mmolToMgdl, mgdlToMmol, roundResult } from '../../lib/glucose-units';
+    const form = document.querySelector('[data-converter]');
+    const output = document.querySelector('[data-result]');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!(form instanceof HTMLFormElement) || !(output instanceof HTMLOutputElement)) return;
+      const data = new FormData(form);
+      const raw = String(data.get('value') ?? '').trim().replace(',', '.');
+      const value = Number(raw);
+      const direction = data.get('direction') === 'mgdl-to-mmol' ? 'mgdl-to-mmol' : 'mmol-to-mgdl';
+      if (!Number.isFinite(value) || value <= 0) {
+        output.textContent = 'Введите корректное число больше нуля.';
+        return;
+      }
+      const converted = direction === 'mmol-to-mgdl' ? mmolToMgdl(value) : mgdlToMmol(value);
+      const rounded = roundResult(converted, direction);
+      output.textContent = direction === 'mmol-to-mgdl' ? `${rounded} мг/дл` : `${String(rounded).replace('.', ',')} ммоль/л`;
+    });
+  </script>
+</BaseLayout>
+<style>
+  .tool-hero { padding: clamp(4rem, 9vw, 7rem) 0; border-bottom: 1px solid var(--blue); background: var(--paper); }
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 7vw, 6rem); align-items: center; }
+  .tool-grid h1 { margin: 0; color: var(--blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--font-display); letter-spacing: -.035em; }
+  .tool-grid > div > .eyebrow { color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .tool-grid > div > p:last-child { color: var(--muted); font-size: 18px; }
+  .converter { padding: 28px 0; border-block: 1px solid var(--blue); border-radius: 0; background: transparent; }
+  .converter > label, legend { color: var(--blue); font: 400 11px/1.5 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .converter > input { width: 100%; min-height: 3.7rem; margin: .5rem 0 1rem; padding: .8rem 0; border: 0; border-bottom: 1px solid var(--blue); border-radius: 0; background: transparent; color: var(--ink); font: 400 28px/1.3 var(--font-mono); }
+  fieldset { display: grid; gap: .6rem; margin: 0 0 1.2rem; padding: 0; border: 0; }
+  fieldset label { display: flex; align-items: center; gap: .55rem; }
+  fieldset input { width: 1.2rem; height: 1.2rem; accent-color: var(--blue); }
+  .result { display: block; min-height: 4.5rem; margin-top: 1.2rem; padding: 1rem 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--blue); font: 400 24px/1.3 var(--font-mono); }
+  .explanation { max-width: var(--dw-reading); }
+  .explanation h2 { color: var(--blue); font: 600 34px/1.08 var(--font-display); }
+  .privacy { padding: 1rem 0; border-block: 1px solid var(--blue); background: transparent; }
+  .notice { margin-top: 1.5rem; padding: 1rem 0; border-block: 1px solid var(--blue); border-radius: 0; background: transparent; color: var(--ink); }
+  @media (max-width: 48rem) { .tool-grid { grid-template-columns: 1fr; } }
+</style>

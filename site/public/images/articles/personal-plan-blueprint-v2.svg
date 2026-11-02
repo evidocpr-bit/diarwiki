@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
+  <title id="title">Шесть равноправных разделов личного плана</title>
+  <desc id="desc">Вокруг карточки «Мой план» расположены препараты, измерения, низкая глюкоза, высокая глюкоза и кетоны, болезнь и контакты.</desc>
+  <rect width="900" height="520" fill="#073b8c"/>
+  <text x="48" y="58" fill="#fff" font-family="Golos Text, Arial, sans-serif" font-size="30" font-weight="700">Личный план — не одна памятка</text>
+  <text x="48" y="90" fill="#cbdcff" font-family="Golos Text, Arial, sans-serif" font-size="17">Шесть разделов работают вместе, но не идут по порядку</text>
+  <g font-family="Golos Text, Arial, sans-serif">
+    <g transform="translate(48 126)">
+      <rect width="244" height="104" rx="18" fill="#0b4aa8" stroke="#7da8ff"/>
+      <text x="22" y="40" fill="#ffb15a" font-size="14" font-weight="700">01</text>
+      <text x="22" y="70" fill="#fff" font-size="20" font-weight="700">Препараты</text>
+      <text x="22" y="92" fill="#cbdcff" font-size="14">названия · дозы · устройства</text>
+    </g>
+    <g transform="translate(328 126)">
+      <rect width="244" height="104" rx="18" fill="#0b4aa8" stroke="#7da8ff"/>
+      <text x="22" y="40" fill="#ffb15a" font-size="14" font-weight="700">02</text>
+      <text x="22" y="70" fill="#fff" font-size="20" font-weight="700">Измерения</text>
+      <text x="22" y="92" fill="#cbdcff" font-size="14">когда · чем · что дальше</text>
+    </g>
+    <g transform="translate(608 126)">
+      <rect width="244" height="104" rx="18" fill="#0b4aa8" stroke="#7da8ff"/>
+      <text x="22" y="40" fill="#ffb15a" font-size="14" font-weight="700">03</text>
+      <text x="22" y="70" fill="#fff" font-size="20" font-weight="700">Низкая глюкоза</text>
+      <text x="22" y="92" fill="#cbdcff" font-size="14">короткий срочный сценарий</text>
+    </g>
+    <g transform="translate(48 350)">
+      <rect width="244" height="104" rx="18" fill="#0b4aa8" stroke="#7da8ff"/>
+      <text x="22" y="40" fill="#ffb15a" font-size="14" font-weight="700">04</text>
+      <text x="22" y="70" fill="#fff" font-size="20" font-weight="700">Высокая и кетоны</text>
+      <text x="22" y="92" fill="#cbdcff" font-size="14">проверка · связь · помощь</text>
+    </g>
+    <g transform="translate(328 350)">
+      <rect width="244" height="104" rx="18" fill="#0b4aa8" stroke="#7da8ff"/>
+      <text x="22" y="40" fill="#ffb15a" font-size="14" font-weight="700">05</text>
+      <text x="22" y="70" fill="#fff" font-size="20" font-weight="700">Болезнь</text>
+      <text x="22" y="92" fill="#cbdcff" font-size="14">что делать вне обычного дня</text>
+    </g>
+    <g transform="translate(608 350)">
+      <rect width="244" height="104" rx="18" fill="#0b4aa8" stroke="#7da8ff"/>
+      <text x="22" y="40" fill="#ffb15a" font-size="14" font-weight="700">06</text>
+      <text x="22" y="70" fill="#fff" font-size="20" font-weight="700">Контакты и запас</text>
+      <text x="22" y="92" fill="#cbdcff" font-size="14">кому звонить · что пополнить</text>
+    </g>
+    <g transform="translate(329 252)">
+      <rect width="242" height="72" rx="36" fill="#ff7a1a"/>
+      <text x="121" y="45" text-anchor="middle" fill="#fff" font-size="23" font-weight="800">МОЙ ПЛАН</text>
+    </g>
+  </g>
+</svg>

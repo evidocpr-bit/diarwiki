@@ -1,0 +1,33 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  kind?: string;
+  caution?: string;
+}
+const { title, href, kind = 'Источник', caution } = Astro.props;
+---
+
+<aside class="source-story">
+  <div>
+    <span>{kind}</span>
+    <h3><a href={href}>{title}</a></h3>
+  </div>
+  <div class="source-story__text"><slot /></div>
+  {caution && <p class="source-story__caution"><strong>Граница применимости:</strong> {caution}</p>}
+</aside>
+
+<style>
+  .source-story {
+    margin: 1.5rem 0;
+    padding: 1.2rem 1.3rem;
+    border: 0;
+    border-inline-start: 4px solid var(--brand);
+    border-radius: 0;
+    background: #fff;
+  }
+  .source-story span { color: var(--brand); font-size: .95rem; font-weight: 600; }
+  .source-story h3 { margin: .25rem 0 .65rem !important; font-size: 1.08rem !important; }
+  .source-story__text :global(p) { margin: 0; }
+  .source-story__caution { margin: .85rem 0 0; color: var(--ink-muted); font-size: .95rem; }
+</style>

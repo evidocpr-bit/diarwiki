@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "roles": [
+    {
+      "key": "owner",
+      "name": "Владелец",
+      "description": "Полное управление CMS, пользователями, правами и выпусками.",
+      "icon": "shield_person",
+      "policies": [
+        "owner-admin",
+        "content-publish"
+      ]
+    },
+    {
+      "key": "editor",
+      "name": "Редактор",
+      "description": "Подготовка материалов, источников, библиотеки и медиа без права публикации и медицинского подтверждения.",
+      "icon": "edit_note",
+      "policies": [
+        "editorial-read",
+        "material-edit",
+        "library-source-media-edit",
+        "editorial-workflow"
+      ]
+    },
+    {
+      "key": "medical_reviewer",
+      "name": "Медицинский рецензент",
+      "description": "Чтение назначенных материалов, замечания и решение по конкретной версии.",
+      "icon": "clinical_notes",
+      "policies": [
+        "medical-review"
+      ]
+    },
+    {
+      "key": "release_service",
+      "name": "Служба выпуска",
+      "description": "Техническая учётная запись без доступа к панели.",
+      "icon": "deployed_code",
+      "policies": [
+        "release-service"
+      ]
+    }
+  ]
+}

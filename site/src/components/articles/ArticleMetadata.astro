@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import ReviewBadge from '../ReviewBadge.astro';
+
+const docs = await getCollection('docs');
+const currentPath = Astro.url.pathname;
+const entry = docs.find((item) => `/${item.id.replace(/\/index$/u, '')}/`.replace(/\/+/gu, '/') === currentPath);
+
+if (!entry) throw new Error(`Article metadata could not find a content entry for ${currentPath}`);
+
+const { data } = entry;
+const updated = data.updatedAt.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+const levelLabels = {
+  basic: 'Базовый материал',
+  practical: 'Практический материал',
+  advanced: 'Углублённый материал',
+} as const;
+
+const base = 'https://diarwiki.ru';
+const reviewed = data.medicalReview === 'reviewed';
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalWebPage',
+  '@id': `${base}${currentPath}#article`,
+  url: `${base}${currentPath}`,
+  headline: data.title,
+  description: data.description,
+  ...(data.publishedAt ? { datePublished: data.publishedAt.toISOString().slice(0, 10) } : {}),
+  dateModified: data.updatedAt.toISOString().slice(0, 10),
+  inLanguage: 'ru-RU',
+  isPartOf: { '@id': `${base}/#website` },
+  publisher: { '@id': `${base}/#organization` },
+  about: data.topics.map((name) => ({ '@type': 'Thing', name })),
+  ...(reviewed && data.reviewedBy ? {
+    reviewedBy: {
+      '@type': 'Person',
+      name: data.reviewedBy,
+      jobTitle: data.reviewerSpecialty ?? undefined,
+      url: data.reviewerProfileUrl ?? undefined,
+    },
+    lastReviewed: data.reviewedAt?.toISOString().slice(0, 10),
+  } : {}),
+};
+---
+
+<section class="article-intro" aria-label="О материале">
+  <p class="article-intro__summary">{data.summary}</p>
+  <div class="article-intro__meta">
+    <span>{levelLabels[data.level]}</span>
+    <span>Обновлено {updated}</span>
+    {data.audience.length > 0 && <span>Для кого: {data.audience.join(', ')}</span>}
+  </div>
+  <ReviewBadge
+    status={data.medicalReview}
+    reviewer={data.reviewedBy}
+    specialty={data.reviewerSpecialty}
+    reviewedAt={data.reviewedAt}
+  />
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<style>
+  .article-intro {
+    margin: 1.25rem 0 2rem;
+    padding: clamp(1.15rem, 3vw, 1.6rem);
+    border: 1px solid var(--line);
+    background: white;
+    border-inline-start: 4px solid var(--brand);
+  }
+  .article-intro__summary {
+    max-width: 46rem;
+    margin: 0 0 1rem;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.12rem, 2.4vw, 1.35rem);
+    font-weight: 660;
+    line-height: 1.45;
+  }
+  .article-intro__meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .article-intro__meta span { color: var(--ink-muted); font-size: .9rem; font-weight: 550; }
+</style>

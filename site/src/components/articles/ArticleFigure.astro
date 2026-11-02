@@ -1,0 +1,13 @@
+---
+interface Props { src: string; alt: string; caption?: string; number?: number; }
+const { src, alt, caption, number } = Astro.props;
+const isFirstFigure = number === 1;
+---
+<figure class="article-figure">
+  {number && <div class="article-figure__head"><span>Fig. Ø{String(number).padStart(2, '0')} — схема</span><span>Не в масштабе</span></div>}
+  <img src={src} alt={alt} width="900" height="520" loading={isFirstFigure ? 'eager' : 'lazy'} decoding="async" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+<style>
+  .article-figure{margin:0;border:1px solid var(--dw-blue);background:var(--dw-blue);color:#fff}.article-figure__head{display:flex;justify-content:space-between;gap:16px;padding:10px 16px;border-bottom:1px solid var(--dw-line-on-blue);font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.article-figure img{display:block;width:100%;height:auto;padding:0;background:var(--dw-blue)}.article-figure figcaption{padding:10px 16px;border-top:1px solid var(--dw-line-on-blue);font-size:14px;line-height:1.45;color:rgb(255 255 255 / 86%)}
+</style>

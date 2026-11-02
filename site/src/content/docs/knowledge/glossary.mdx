@@ -1,0 +1,69 @@
+---
+title: Словарь диабета и мониторинга
+description: Простые определения терминов о глюкозе, инсулине, датчиках и статистике мониторинга со ссылками на подробные объяснения.
+summary: Термины нужны не для экзамена, а чтобы понимать инструкцию, отчёт и разговор со специалистом.
+schemaVersion: 1
+contentId: glossary-basic-terms
+contentType: glossary
+status: published
+audience: [взрослые, близкие]
+topics: [Термины]
+medicalReview: pending
+reviewedBy: null
+reviewedAt: null
+publishedAt: 2026-10-17
+updatedAt: 2026-11-02
+lastUpdated: 2026-11-02
+sourceIds: [niddk-what-is-diabetes, niddk-continuous-glucose-monitoring, nhs-cgm-and-hcl]
+relatedIds: [article-what-is-diabetes, article-read-sources, article-cgm-basics]
+risk: low
+articleFormat: reference
+level: basic
+disclaimerScope: standard
+tableOfContents: true
+---
+
+import QuickAnswer from '../../../components/articles/QuickAnswer.astro';
+import ArticleSources from '../../../components/articles/ArticleSources.astro';
+import NextArticle from '../../../components/articles/NextArticle.astro';
+
+<QuickAnswer title="Как пользоваться словарём">
+  Откройте нужное слово из оглавления. Определение объясняет смысл, но не задаёт личный порог или действие. Для цифр и решений всегда нужен контекст: тип диабета, устройство и личный план.
+</QuickAnswer>
+
+<div class="term-card-grid">
+  <div class="term-card"><h2 id="glyukoza">Глюкоза</h2><p>Один из источников энергии. В материалах о диабете измеряют её уровень в крови или межклеточной жидкости.</p></div>
+  <div class="term-card"><h2 id="insulin">Инсулин</h2><p>Гормон, который помогает глюкозе поступать из крови в клетки. При СД1 его вводят извне.</p></div>
+  <div class="term-card"><h2 id="glikemiya">Гликемия</h2><p>Уровень глюкозы в крови. «Гипо-» и «гипер-» обозначают низкий и высокий уровень.</p></div>
+  <div class="term-card"><h2 id="saharnyi-diabet-1-tipa">СД1</h2><p>Сахарный диабет 1 типа — аутоиммунное заболевание, при котором повреждаются клетки, вырабатывающие инсулин.</p></div>
+  <div class="term-card"><h2 id="glyukometr">Глюкометр</h2><p>Прибор для измерения глюкозы в капле крови. Это не то же самое, что сенсор.</p></div>
+  <div class="term-card"><h2 id="cgm">НМГ / CGM</h2><p>Непрерывный мониторинг глюкозы. Сенсор регулярно оценивает глюкозу в межклеточной жидкости.</p></div>
+  <div class="term-card"><h2 id="intersticialnaya-zhidkost">Межклеточная жидкость</h2><p>Жидкость между клетками. Именно в ней работает большинство современных сенсоров.</p></div>
+  <div class="term-card"><h2 id="trend">Стрелка тренда</h2><p>Условный знак направления и скорости изменения. Значение стрелок зависит от системы.</p></div>
+  <div class="term-card"><h2 id="tir">TIR</h2><p>Time in Range — доля времени в заданном целевом диапазоне. Сам диапазон должен быть указан рядом.</p></div>
+  <div class="term-card"><h2 id="tbr-tar">TBR и TAR</h2><p>Время ниже диапазона и выше диапазона. Они помогают увидеть, за счёт чего меняется TIR.</p></div>
+  <div class="term-card"><h2 id="cv">CV</h2><p>Коэффициент вариации — относительная мера разброса показаний вокруг среднего значения.</p></div>
+  <div class="term-card"><h2 id="gmi">GMI</h2><p>Расчётный показатель по данным мониторинга. Это не лабораторный HbA1c и не его замена.</p></div>
+  <div class="term-card"><h2 id="agp">AGP</h2><p>Амбулаторный профиль глюкозы — стандартизированный отчёт, который собирает несколько дней CGM в условные сутки и показывает медиану, диапазоны разброса и основные метрики.</p></div>
+  <div class="term-card"><h2 id="hba1c">HbA1c</h2><p>Лабораторный показатель гликированного гемоглобина. Он связан со средней глюкозой за предшествующий период, но не показывает время и выраженность отдельных снижений и подъёмов.</p></div>
+  <div class="term-card"><h2 id="sd">SD</h2><p>Стандартное отклонение — абсолютная мера разброса значений вокруг среднего. В отчётах CGM его дополняет CV, который учитывает уровень средней глюкозы.</p></div>
+  <div class="term-card"><h2 id="mard">MARD</h2><p>Средняя абсолютная относительная разница между показаниями системы и эталонными измерениями в исследовании. Меньше обычно означает ближе, но сравнивать MARD из разных исследований напрямую нельзя без проверки условий.</p></div>
+  <div class="term-card"><h2 id="pompa">Инсулиновая помпа</h2><p>Устройство, которое подаёт инсулин по заданной программе. Возможности автоматизации зависят от системы.</p></div>
+  <div class="term-card"><h2 id="zakrytaya-petlya">Автоматизированная подача</h2><p>Система использует данные сенсора для автоматической корректировки части подачи инсулина. Она всё равно требует обучения и действий человека.</p></div>
+  <div class="term-card"><h2 id="oficialnyi-i-polzovatelskii">Штатный и пользовательский способ</h2><p>Штатный описан производителем. Пользовательский создан сообществом и может влиять на совместимость, гарантию и точность.</p></div>
+  <div class="term-card"><h2 id="master-follower">Мастер и фолловер</h2><p>Мастером в сообществах называют основной телефон или приложение, которое первым получает данные сенсора. Фолловер — приложение или устройство наблюдателя, куда показания передаются через интернет или другой промежуточный сервис.</p></div>
+</div>
+
+## Почему рядом с метрикой нужны единицы и период
+
+Фраза «TIR 70» неполна: неясно, это проценты или часы, какой диапазон выбран и за сколько дней собраны данные. Та же проблема возникает со средним значением, MARD и другими числами. Хорошее объяснение всегда называет метрику, единицы, период и условия.
+
+<ArticleSources sources={[
+  { title: 'What Is Diabetes?', organization: 'NIDDK', href: 'https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes', note: 'Глюкоза, инсулин и основные типы диабета.' },
+  { title: 'Continuous Glucose Monitoring', organization: 'NIDDK', href: 'https://www.niddk.nih.gov/health-information/diabetes/overview/managing-diabetes/continuous-glucose-monitoring', note: 'Принцип работы сенсора и межклеточная жидкость.' },
+  { title: 'Continuous glucose monitoring and hybrid closed loop', organization: 'NHS', href: 'https://www.nhs.uk/tests-and-treatments/cgm-and-hcl-for-diabetes/', note: 'Общее описание НМГ и автоматизированных систем.' },
+]} />
+
+<NextArticle href="/knowledge/cgm-basics/" title="Что показывает датчик" description="Связать число, стрелку и график в одну понятную картину." />
+
+[Предложить термин или исправление](/contact/).

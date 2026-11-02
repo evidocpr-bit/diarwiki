@@ -1,0 +1,386 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="100%" role="img" aria-labelledby="t d">
+  <title id="t">Как устроен DIY замкнутый цикл</title>
+  <desc id="d">Схема DIY-системы замкнутого цикла, собранной сообществом, с разрезами устройств: сенсор с нитью-электродом в подкожной клетчатке измеряет глюкозу; телефон получает данные через JugglucoNG, xDrip+ и AndroidAPS и рассчитывает дозу; инсулиновая помпа с приводом и картриджем вводит инсулин через катетер под кожу; данные выгружаются на собственный сервер Nightscout для удалённого просмотра. Схема демонстрирует возможности и не является призывом к действию.</desc>
+  <defs>
+    <pattern id="gs" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#fff" stroke-opacity=".05"/></pattern>
+    <pattern id="gl" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#gs)"/><path d="M100 0H0V100" fill="none" stroke="#fff" stroke-opacity=".1"/></pattern>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#1D45D8"/><path d="M0 0V6" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/></pattern>
+    <pattern id="fat" width="30" height="24" patternUnits="userSpaceOnUse"><ellipse cx="8" cy="7" rx="7.5" ry="5.5" fill="none" stroke="#fff" stroke-opacity=".25"/><ellipse cx="23" cy="18" rx="7.5" ry="5.5" fill="none" stroke="#fff" stroke-opacity=".25"/></pattern>
+    <linearGradient id="subq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#1D45D8" stop-opacity=".9"/></linearGradient>
+    <linearGradient id="skinG" gradientUnits="userSpaceOnUse" x1="150" y1="0" x2="510" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".14" stop-color="#fff"/><stop offset=".86" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <mask id="skinMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="1100"><rect width="1600" height="1100" fill="url(#skinG)"/></mask>
+    <radialGradient id="vig" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="#2a5cff" stop-opacity=".55"/><stop offset="1" stop-color="#0d2fae" stop-opacity="0"/></radialGradient>
+    <linearGradient id="ins" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fe3ff" stop-opacity=".55"/><stop offset="1" stop-color="#8fe3ff" stop-opacity=".25"/></linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <clipPath id="cart"><rect x="1162" y="324" width="256" height="56" rx="9"/></clipPath>
+    <path id="pSens" d="M412 290 C490 210 570 230 632 316"/>
+    <path id="pPump" d="M880 300 C940 240 1000 250 1060 300"/>
+    <path id="pNs" d="M968 756 C1015 756 1030 690 1076 690"/>
+    <path id="pRem" d="M1112 728 C1140 800 1440 800 1488 750"/>
+    <path id="pTubeL" d="M600 966 H1460"/>
+    <path id="pTube" d="M1488 352 C1528 352 1540 380 1540 420 L1540 900 C1540 950 1510 966 1460 966 L600 966 C552 966 540 950 540 920 V800 C540 770 500 758 424 758"/>
+  </defs>
+
+  <style>
+    text{font-family:'IBM Plex Mono','JetBrains Mono',ui-monospace,'Courier New',monospace;fill:#fff;letter-spacing:.05em}
+    .ln{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round}
+    .cap{font-size:15px}
+    .sub{font-size:12px;fill-opacity:.75}
+    .num{fill:#8fe3ff}
+    .flow{fill:none;stroke:#8fe3ff;stroke-width:1.6;stroke-dasharray:4 8;animation:dash 1.2s linear infinite}
+    .tube-ins{fill:none;stroke:#8fe3ff;stroke-width:3.4;stroke-linecap:round;stroke-dasharray:1 16;animation:drip 1.6s linear infinite}
+    .core{stroke-dasharray:3 6;animation:drip 1s linear infinite}
+    .wave{animation:wave 1.8s ease-out infinite}
+    .spin{transform-box:fill-box;transform-origin:center;animation:spin 3s linear infinite}
+    .spinr{transform-box:fill-box;transform-origin:center;animation:spin 2s linear infinite reverse}
+    .loop{transform-box:fill-box;transform-origin:center;animation:spin 4s linear infinite}
+    .plunger{animation:push 14s linear infinite}
+    .rod{transform-box:fill-box;transform-origin:left center;animation:rod 14s linear infinite}
+    .fill{transform-box:fill-box;transform-origin:right center;animation:fill 14s linear infinite}
+    .fil{animation:fil 2.4s ease-in-out infinite}
+    .bg{opacity:0;animation:cyc 12s infinite}
+    .bg.b2{animation-delay:3s}.bg.b3{animation-delay:6s}.bg.b4{animation-delay:9s}
+    .cgm{stroke-dasharray:420;stroke-dashoffset:420;animation:draw 12s ease-in-out infinite}
+    .blink{animation:blink 2.4s steps(1) infinite}
+    .led{animation:blink 1.2s steps(1) infinite}
+    .scan{animation:scan 9s linear infinite}
+    @keyframes dash{to{stroke-dashoffset:-24}}
+    @keyframes drip{to{stroke-dashoffset:-34}}
+    @keyframes wave{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes push{from{transform:translateX(0)}to{transform:translateX(44px)}}
+    @keyframes rod{from{transform:scaleX(1)}to{transform:scaleX(1.4)}}
+    @keyframes fill{from{transform:scaleX(1)}to{transform:scaleX(.79)}}
+    @keyframes fil{0%,100%{opacity:.55}50%{opacity:1}}
+    @keyframes cyc{0%{opacity:0}3%{opacity:1}23%{opacity:1}26%{opacity:0}100%{opacity:0}}
+    @keyframes draw{0%{stroke-dashoffset:420}30%{stroke-dashoffset:0}88%{stroke-dashoffset:0;opacity:1}96%{opacity:0}100%{stroke-dashoffset:0;opacity:0}}
+    @keyframes blink{0%{opacity:1}50%{opacity:.25}}
+    @keyframes scan{0%{transform:translateY(-80px);opacity:0}8%{opacity:.5}92%{opacity:.5}100%{transform:translateY(1100px);opacity:0}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important}.bg.b1{opacity:1}.cgm{stroke-dashoffset:0}}
+  </style>
+
+  <rect width="1600" height="1100" fill="#1D45D8"/>
+  <rect width="1600" height="1100" fill="url(#vig)"/>
+  <rect width="1600" height="1100" fill="url(#gl)"/>
+  <rect class="scan" width="1600" height="2" fill="#fff" opacity=".35"/>
+
+  <!-- Header -->
+  <text x="60" y="48" style="font-size:20px">DIARWIKI</text>
+  <text x="180" y="48" class="sub" style="font-size:13px">КАК УСТРОЕН ЗАМКНУТЫЙ ЦИКЛ</text>
+  <text x="1540" y="48" text-anchor="end" class="sub" style="font-size:13px">DIY · СБОРКА, СОЗДАННАЯ СООБЩЕСТВОМ · OPEN SOURCE</text>
+  <path class="ln" stroke-opacity=".4" stroke-width="1" d="M60 66H1540"/>
+  <path class="ln" stroke-opacity=".25" stroke-width="1" stroke-dasharray="3 6" d="M580 100 V940 M1020 100 V600"/>
+
+  <!-- ===== 01 SENSOR SECTION ===== -->
+  <text x="60" y="124" class="cap"><tspan class="num">01</tspan>  СЕНСОР ГЛЮКОЗЫ</text><text x="60" y="144" class="sub" style="font-size:11px">разрез · измеряет глюкозу в межклеточной жидкости</text>
+  <g mask="url(#skinMask)">
+    <rect x="150" y="380" width="360" height="14" fill="#fff" fill-opacity=".2"/>
+    <rect x="150" y="394" width="360" height="44" fill="#fff" fill-opacity=".09"/>
+    <rect x="150" y="438" width="360" height="86" fill="url(#fat)"/>
+    <rect x="150" y="438" width="360" height="86" fill="url(#subq)"/>
+    <path class="ln" stroke-width="1" stroke-opacity=".6" d="M150 394 Q159.0 392 168 394 Q177.0 396 186 394 Q195.0 392 204 394 Q213.0 396 222 394 Q231.0 392 240 394 Q249.0 396 258 394 Q267.0 392 276 394 Q285.0 396 294 394 Q303.0 392 312 394 Q321.0 396 330 394 Q339.0 392 348 394 Q357.0 396 366 394 Q375.0 392 384 394 Q393.0 396 402 394 Q411.0 392 420 394 Q429.0 396 438 394 Q447.0 392 456 394 Q465.0 396 474 394 Q483.0 392 492 394 Q501.0 396 510 394"/>
+    <path class="ln" stroke-width="1" stroke-opacity=".35" d="M150 438 Q165.0 434 180 438 Q195.0 442 210 438 Q225.0 434 240 438 Q255.0 442 270 438 Q285.0 434 300 438 Q315.0 442 330 438 Q345.0 434 360 438 Q375.0 442 390 438 Q405.0 434 420 438 Q435.0 442 450 438 Q465.0 434 480 438 Q495.0 442 510 438"/>
+    <path class="ln" stroke-width="1.6" d="M150 380 H510"/>
+  </g>
+  <g class="ln" stroke-width="1" stroke-opacity=".5" ><path d="M512 387 H522 M512 416 H522 M512 476 H522"/></g>
+  <g style="font-size:9.5px" class="sub" >
+    <text x="528" y="390">ЭПИДЕРМИС</text>
+    <text x="528" y="420">ДЕРМА</text>
+    <text x="528" y="474">ПОДКОЖНАЯ</text>
+    <text x="528" y="487">КЛЕТЧАТКА</text>
+  </g>
+  <g opacity="0"><path d="M200 447 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;98 0" dur="3s" begin="0.0s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3s" begin="0.0s" repeatCount="indefinite"/></g><g opacity="0"><path d="M236 495 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;62 0" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="4s" begin="0.6s" repeatCount="indefinite"/></g><g opacity="0"><path d="M380 455 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;-98 0" dur="5s" begin="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="5s" begin="1.2s" repeatCount="indefinite"/></g><g opacity="0"><path d="M350 500 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;-68 0" dur="3s" begin="1.7999999999999998s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3s" begin="1.7999999999999998s" repeatCount="indefinite"/></g><g opacity="0"><path d="M220 475 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;78 0" dur="4s" begin="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="4s" begin="2.4s" repeatCount="indefinite"/></g><g opacity="0"><path d="M400 485 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;-118 0" dur="5s" begin="3.0s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="5s" begin="3.0s" repeatCount="indefinite"/></g><g opacity="0"><path d="M170 495 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;128 0" dur="3s" begin="3.5999999999999996s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="3s" begin="3.5999999999999996s" repeatCount="indefinite"/></g><g opacity="0"><path d="M410 465 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;-128 0" dur="4s" begin="4.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.8;1" dur="4s" begin="4.2s" repeatCount="indefinite"/></g>
+  <path class="ln fil" stroke="#8fe3ff" stroke-width="3" filter="url(#glow)" d="M290 376 V486"/>
+  <path class="ln" stroke-width="1" d="M287 376 V486 L290 492 L293 486 V376"/>
+  <rect x="160" y="374" width="260" height="7" rx="2" fill="#fff" fill-opacity=".35"/>
+  <path d="M170 376 C170 322 204 294 254 290 H326 C376 294 410 322 410 376 Z" fill="url(#hatch)" stroke="#fff" stroke-width="2"/>
+  <path d="M184 376 C186 334 212 306 256 302 H324 C368 306 394 334 396 376 Z" fill="#1238c4" stroke="#fff" stroke-width="1"/>
+  <rect x="206" y="324" width="70" height="22" rx="5" fill="#1542d0" stroke="#fff" stroke-width="1.4"/>
+  <text x="241" y="339" text-anchor="middle" style="font-size:10px">+ 3V</text>
+  <rect x="196" y="352" width="188" height="8" rx="2" fill="#8fe3ff" fill-opacity=".25" stroke="#fff" stroke-width="1"/>
+  <rect x="300" y="336" width="34" height="16" rx="2" fill="#1542d0" stroke="#fff" stroke-width="1.2"/>
+  <rect x="342" y="341" width="26" height="11" rx="2" fill="#1542d0" stroke="#fff" stroke-width="1"/>
+  <circle cx="317" cy="344" r="2.5" fill="#8fe3ff" class="led"/>
+  <rect x="282" y="360" width="16" height="16" rx="2" fill="#1542d0" stroke="#fff" stroke-width="1"/>
+  <path class="ln wave" style="animation-delay:0.0s" stroke="#8fe3ff" stroke-width="2" d="M403.6 286.5 A14 14 0 0 1 413.5 296.4"/><path class="ln wave" style="animation-delay:0.3s" stroke="#8fe3ff" stroke-width="2" d="M406.2 276.8 A24 24 0 0 1 423.2 293.8"/><path class="ln wave" style="animation-delay:0.6s" stroke="#8fe3ff" stroke-width="2" d="M408.8 267.2 A34 34 0 0 1 432.8 291.2"/>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M112 312 H180 "/><circle cx="180" cy="312" r="2" fill="#fff"/><text x="66" y="316" class="sub" style="font-size:10px">КОРПУС</text>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M118 336 H206 "/><circle cx="206" cy="336" r="2" fill="#fff"/><text x="66" y="340" class="sub" style="font-size:10px">БАТАРЕЯ</text>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M145 360 H196 V356"/><circle cx="196" cy="356" r="2" fill="#fff"/><text x="66" y="364" class="sub" style="font-size:10px">ПЛАТА И ЧИП</text>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M158 470 H286 "/><circle cx="286" cy="470" r="2" fill="#fff"/><text x="66" y="474" class="sub" style="font-size:10px">НИТЬ-ЭЛЕКТРОД</text>
+  <g><path d="M406 520 l4.3 2.5 v5 l-4.3 2.5 l-4.3 -2.5 v-5 z" fill="none" stroke="#8fe3ff" stroke-width="1.3"/><text x="418" y="530" class="sub" style="font-size:10px;fill:#8fe3ff">ГЛЮКОЗА</text></g>
+
+  <!-- ===== 04 CATHETER SECTION ===== -->
+  <text x="60" y="640" class="cap"><tspan class="num">04</tspan>  КАТЕТЕР</text><text x="60" y="660" class="sub" style="font-size:11px">разрез · доставляет инсулин под кожу</text>
+  <g mask="url(#skinMask)">
+    <rect x="150" y="790" width="360" height="14" fill="#fff" fill-opacity=".2"/>
+    <rect x="150" y="804" width="360" height="44" fill="#fff" fill-opacity=".09"/>
+    <rect x="150" y="848" width="360" height="86" fill="url(#fat)"/>
+    <rect x="150" y="848" width="360" height="86" fill="url(#subq)"/>
+    <path class="ln" stroke-width="1" stroke-opacity=".6" d="M150 804 Q159.0 802 168 804 Q177.0 806 186 804 Q195.0 802 204 804 Q213.0 806 222 804 Q231.0 802 240 804 Q249.0 806 258 804 Q267.0 802 276 804 Q285.0 806 294 804 Q303.0 802 312 804 Q321.0 806 330 804 Q339.0 802 348 804 Q357.0 806 366 804 Q375.0 802 384 804 Q393.0 806 402 804 Q411.0 802 420 804 Q429.0 806 438 804 Q447.0 802 456 804 Q465.0 806 474 804 Q483.0 802 492 804 Q501.0 806 510 804"/>
+    <path class="ln" stroke-width="1" stroke-opacity=".35" d="M150 848 Q165.0 844 180 848 Q195.0 852 210 848 Q225.0 844 240 848 Q255.0 852 270 848 Q285.0 844 300 848 Q315.0 852 330 848 Q345.0 844 360 848 Q375.0 852 390 848 Q405.0 844 420 848 Q435.0 852 450 848 Q465.0 844 480 848 Q495.0 852 510 848"/>
+    <path class="ln" stroke-width="1.6" d="M150 790 H510"/>
+  </g>
+  <g class="ln" stroke-width="1" stroke-opacity=".5" display="none"><path d="M512 797 H522 M512 826 H522 M512 886 H522"/></g>
+  <g style="font-size:9.5px" class="sub" display="none">
+    <text x="528" y="800">ЭПИДЕРМИС</text>
+    <text x="528" y="830">ДЕРМА</text>
+    <text x="528" y="884">ПОДКОЖНАЯ</text>
+    <text x="528" y="897">КЛЕТЧАТКА</text>
+  </g>
+  <circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;-32 13" dur="3s" begin="0.00s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="0.00s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="0.00s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;-21 28" dur="3s" begin="0.37s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="0.37s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="0.37s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;9 36" dur="3s" begin="0.74s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="0.74s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="0.74s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;26 19" dur="3s" begin="1.11s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="1.11s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="1.11s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;41 10" dur="3s" begin="1.48s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="1.48s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="1.48s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;-49 11" dur="3s" begin="1.85s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="1.85s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="1.85s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;17 24" dur="3s" begin="2.22s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="2.22s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="2.22s" repeatCount="indefinite"/></circle><circle cx="290" cy="894" r="3.5" fill="#8fe3ff" opacity="0">
+      <animateTransform attributeName="transform" type="translate" values="0 0;-7 31" dur="3s" begin="2.59s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.9;0" dur="3s" begin="2.59s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;6" dur="3s" begin="2.59s" repeatCount="indefinite"/></circle>
+  <path d="M286 786 V884 L290 894 L294 884 V786 Z" fill="#1238c4" stroke="#fff" stroke-width="1.4"/>
+  <path class="ln core" stroke="#8fe3ff" stroke-width="2" d="M290 786 V888"/>
+  <rect x="186" y="784" width="208" height="7" rx="2" fill="#fff" fill-opacity=".35"/>
+  <path d="M196 786 C196 752 226 728 270 726 H312 C356 728 384 752 384 786 Z" fill="url(#hatch)" stroke="#fff" stroke-width="2"/>
+  <path d="M208 786 C210 760 234 740 272 738 H310 C346 740 370 760 372 786 Z" fill="#1238c4" stroke="#fff" stroke-width="1"/>
+  <rect x="380" y="748" width="44" height="20" rx="4" fill="#1542d0" stroke="#fff" stroke-width="1.4"/>
+  <path class="ln" stroke-width="5" stroke-opacity=".25" d="M424 758 H290 V786"/>
+  <path class="ln core" stroke="#8fe3ff" stroke-width="2" d="M424 758 H290 V786"/>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M158 742 H208 "/><circle cx="208" cy="742" r="2" fill="#fff"/><text x="66" y="746" class="sub" style="font-size:10px">КОРПУС НАБОРА</text>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M112 846 H286 "/><circle cx="286" cy="846" r="2" fill="#fff"/><text x="66" y="850" class="sub" style="font-size:10px">КАНЮЛЯ</text>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M171 906 H262 "/><circle cx="262" cy="906" r="2" fill="#fff"/><text x="66" y="910" class="sub" style="font-size:10px">ИНСУЛИН В ТКАНИ</text>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M402 718 V748"/><text x="396" y="712" class="sub" style="font-size:10px">КОННЕКТОР</text>
+
+  <!-- tubing pump -> catheter -->
+  <path class="ln" stroke-width="6" stroke-opacity=".85" d="M1488 352 C1528 352 1540 380 1540 420 L1540 900 C1540 950 1510 966 1460 966 L600 966 C552 966 540 950 540 920 V800 C540 770 500 758 424 758"/>
+  <path class="ln" stroke-width="3" stroke="#1D45D8" d="M1488 352 C1528 352 1540 380 1540 420 L1540 900 C1540 950 1510 966 1460 966 L600 966 C552 966 540 950 540 920 V800 C540 770 500 758 424 758"/>
+  <path class="tube-ins" d="M1488 352 C1528 352 1540 380 1540 420 L1540 900 C1540 950 1510 966 1460 966 L600 966 C552 966 540 950 540 920 V800 C540 770 500 758 424 758"/>
+  <text class="sub" style="font-size:10px" dy="-14"><textPath href="#pTubeL" startOffset="28%">ИНФУЗИОННАЯ ТРУБКА · ИНСУЛИН</textPath></text>
+
+  <!-- ===== 02 PHONE ===== -->
+  <text x="620" y="124" class="cap"><tspan class="num">02</tspan>  ТЕЛЕФОН — МОЗГ СИСТЕМЫ</text><text x="620" y="144" class="sub" style="font-size:11px">получает данные и считает дозу</text>
+  <!-- Phone with AndroidAPS -->
+  <g transform="translate(-198 60) scale(.8)"><g transform="rotate(-8 1210 450)">
+    <rect x="1060" y="150" width="300" height="600" rx="46" fill="#1542d0" stroke="#fff" stroke-width="2.4"/>
+    <rect x="1068" y="158" width="284" height="584" rx="40" fill="none" stroke="#fff" stroke-width="1"/>
+    <path class="ln" stroke-width="2" d="M1362 250 V300 M1362 330 V400"/>
+    <rect x="1080" y="196" width="260" height="520" rx="16" fill="#0f35b4" stroke="#fff" stroke-width="1.4"/>
+    <rect x="1180" y="172" width="60" height="6" rx="3" class="ln" stroke-width="1.2"/>
+    <circle cx="1154" cy="175" r="4" class="ln" stroke-width="1.2"/>
+
+    <!-- status / app bar -->
+    <text x="1094" y="217" style="font-size:11px">20:55</text>
+    <text x="1326" y="217" text-anchor="end" style="font-size:11px">ᛒ  ▮ 39%</text>
+    <path class="ln" stroke-width="1.6" d="M1094 238 H1108 M1094 244 H1108 M1094 250 H1108"/>
+    <text x="1118" y="250" style="font-size:14px;font-weight:600">AndroidAPS</text>
+    <text x="1326" y="250" text-anchor="end" style="font-size:14px">⋮</text>
+    <g style="font-size:10px">
+      <text x="1094" y="279">НАЧАЛО</text>
+      <text x="1166" y="279" fill-opacity=".6">ДЕЙ</text>
+      <text x="1206" y="279" fill-opacity=".6">COMBO</text>
+      <text x="1268" y="279" fill-opacity=".6">ЗЦ</text>
+    </g>
+    <path class="ln" stroke-width="2" d="M1094 287 H1146"/>
+    <path class="ln" stroke-width=".8" stroke-opacity=".35" d="M1084 288 H1336"/>
+    <rect x="1094" y="298" width="116" height="22" rx="4" class="ln" stroke-width="1"/>
+    <text x="1152" y="313" text-anchor="middle" style="font-size:10px">ПРОФИЛЬ 100%</text>
+    <rect x="1218" y="298" width="108" height="22" rx="4" class="ln" stroke-width="1"/>
+    <text x="1272" y="313" text-anchor="middle" style="font-size:10px">ЦЕЛЬ 5,0–5,5</text>
+
+    <!-- big glucose, cycling -->
+    <g style="font-size:60px;font-weight:600;letter-spacing:0">
+      <text class="bg b1" x="1094" y="382">6,4<tspan style="font-size:30px" dx="10" dy="-12">↘</tspan></text>
+      <text class="bg b2" x="1094" y="382">5,9<tspan style="font-size:30px" dx="10" dy="-12">↘</tspan></text>
+      <text class="bg b3" x="1094" y="382">5,6<tspan style="font-size:30px" dx="10" dy="-12">→</tspan></text>
+      <text class="bg b4" x="1094" y="382">5,5<tspan style="font-size:30px" dx="10" dy="-12">→</tspan></text>
+    </g>
+    <g text-anchor="end" style="font-size:10px">
+      <text x="1326" y="344">Δ −0,2</text>
+      <text x="1326" y="359">Δ15 −0,5</text>
+      <text x="1326" y="374" fill-opacity=".65">ммоль/л</text>
+    </g>
+
+    <!-- IOB / COB / TBR / loop -->
+    <g style="font-size:9px" fill-opacity=".65">
+      <text x="1094" y="410">АКТ. ИНС.</text>
+      <text x="1166" y="410">УГЛЕВОДЫ</text>
+      <text x="1236" y="410">ВБ</text>
+    </g>
+    <g style="font-size:14px">
+      <text x="1094" y="430">1,24 ЕД</text>
+      <text x="1166" y="430">18 г</text>
+      <text x="1236" y="430" class="blink" style="fill:#8fe3ff">120%</text>
+    </g>
+    <g class="loop">
+      <path class="ln" stroke="#8fe3ff" stroke-width="2.4" d="M1318 418 A13 13 0 1 1 1305 405"/>
+      <path fill="#8fe3ff" d="M1303 399 L1312 405 L1303 411 Z"/>
+    </g>
+
+    <!-- graph -->
+    <rect x="1094" y="452" width="232" height="140" rx="4" class="ln" stroke-width="1" stroke-opacity=".6"/>
+    <g class="ln" stroke-width=".6" stroke-opacity=".25">
+      <path d="M1110 475 H1322 M1110 512 H1322 M1110 549 H1322 M1150 456 V588 M1194 456 V588 M1238 456 V588 M1282 456 V588"/>
+    </g>
+    <rect x="1110" y="493" width="212" height="56" fill="#8fe3ff" fill-opacity=".1"/>
+    <g style="font-size:8px" fill-opacity=".6">
+      <text x="1098" y="478">12</text><text x="1101" y="515">8</text><text x="1101" y="552">4</text>
+    </g>
+    <g fill="#fff" fill-opacity=".35">
+      <rect x="1112" y="580" width="10" height="6"/><rect x="1124" y="580" width="10" height="6"/>
+      <rect x="1136" y="576" width="10" height="10"/><rect x="1148" y="572" width="10" height="14"/>
+      <rect x="1160" y="572" width="10" height="14"/><rect x="1172" y="578" width="10" height="8"/>
+      <rect x="1184" y="582" width="10" height="4"/><rect x="1196" y="582" width="10" height="4"/>
+      <rect x="1208" y="576" width="10" height="10"/><rect x="1220" y="574" width="10" height="12"/>
+      <rect x="1232" y="578" width="10" height="8"/><rect x="1244" y="580" width="10" height="6"/>
+      <rect x="1256" y="580" width="10" height="6"/><rect x="1268" y="576" width="10" height="10"/>
+      <rect x="1280" y="572" width="10" height="14"/><rect x="1292" y="574" width="10" height="12" fill="#8fe3ff" fill-opacity=".7" class="blink"/>
+    </g>
+    <path class="cgm ln" stroke-width="2.4" d="M1112 530 L1124 524 L1136 516 L1148 508 L1160 503 L1172 506 L1184 514 L1196 521 L1208 524 L1220 520 L1232 513 L1244 509 L1256 512 L1268 518 L1280 523 L1292 525 L1300 524"/>
+    <path class="ln" stroke-width="1.6" stroke-dasharray="2 4" stroke="#8fe3ff" d="M1300 524 Q1312 524 1322 521"/>
+    <circle cx="1300" cy="524" r="3.5" fill="#fff" class="blink"/>
+    <g style="font-size:8px" fill-opacity=".6">
+      <text x="1146" y="604">08</text><text x="1190" y="604">12</text><text x="1234" y="604">16</text><text x="1278" y="604">20</text>
+    </g>
+
+    <!-- buttons -->
+    <g class="ln" stroke-width="1.2">
+      <rect x="1094" y="626" width="74" height="44" rx="6"/>
+      <rect x="1176" y="626" width="74" height="44" rx="6"/>
+      <rect x="1258" y="626" width="68" height="44" rx="6"/>
+    </g>
+    <g text-anchor="middle" style="font-size:9px">
+      <text x="1131" y="653">ИНСУЛИН</text>
+      <text x="1213" y="653">УГЛЕВОДЫ</text>
+      <text x="1292" y="653">КАЛЬК.</text>
+    </g>
+    <path class="ln" stroke-width="2" stroke-opacity=".6" d="M1180 698 H1240"/>
+  </g></g>
+
+  <g><rect x="600" y="720" width="112" height="72" rx="6" fill="#1542d0" stroke="#fff" stroke-width="1.2"/>
+    <text x="610" y="742" style="font-size:12px;font-weight:600;letter-spacing:.03em">JUGGLUCONG</text>
+    <text x="610" y="762" class="sub" style="font-size:9.5px">приём данных</text>
+    <text x="610" y="777" class="sub" style="font-size:9.5px">с сенсора</text></g>
+  <path class="ln" stroke-width="1.4" d="M714 756 H726 M720 750 L727 756 L720 762"/>
+  <g><rect x="728" y="720" width="112" height="72" rx="6" fill="#1542d0" stroke="#fff" stroke-width="1.2"/>
+    <text x="738" y="742" style="font-size:12px;font-weight:600;letter-spacing:.03em">XDRIP+</text>
+    <text x="738" y="762" class="sub" style="font-size:9.5px">график,</text>
+    <text x="738" y="777" class="sub" style="font-size:9.5px">оповещения</text></g>
+  <path class="ln" stroke-width="1.4" d="M842 756 H854 M848 750 L855 756 L848 762"/>
+  <g><rect x="856" y="720" width="112" height="72" rx="6" fill="#1542d0" stroke="#fff" stroke-width="1.2"/>
+    <text x="866" y="742" style="font-size:12px;font-weight:600;letter-spacing:.03em">ANDROIDAPS</text>
+    <text x="866" y="762" class="sub" style="font-size:9.5px">алгоритм:</text>
+    <text x="866" y="777" class="sub" style="font-size:9.5px">расчёт дозы</text></g>
+  <text x="600" y="816" class="sub" style="font-size:10.5px">открытые приложения сообщества · работают на телефоне</text>
+
+  <!-- ===== 03 PUMP SECTION ===== -->
+  <text x="1060" y="124" class="cap"><tspan class="num">03</tspan>  ИНСУЛИНОВАЯ ПОМПА</text><text x="1060" y="144" class="sub" style="font-size:11px">разрез · вводит инсулин по командам</text>
+  <g transform="translate(924.3 80.1) scale(.9)">
+    <path d="M154 132 Q154 111 176 111 H535 Q555 111 563 132 L593 365 Q596 390 572 397 L180 397 Q155 395 153 371 Z" fill="url(#hatch)" stroke="#fff" stroke-width="2.4" vector-effect="non-scaling-stroke"/>
+    <path d="M166 139 Q166 124 183 124 H527 Q544 124 550 142 L578 360 Q581 377 564 382 H184 Q168 380 167 365 Z" fill="#1238c4" stroke="#fff" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+    <path d="M573 333 L608 333 Q620 333 622 346 L625 366 Q626 380 613 382 L578 382" fill="#1542d0" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  </g>
+  <!-- battery -->
+  <rect x="1108" y="200" width="24" height="6" rx="2" fill="#fff" fill-opacity=".6"/>
+  <rect x="1090" y="206" width="60" height="96" rx="7" fill="#1542d0" stroke="#fff" stroke-width="1.4"/>
+  <g fill="#8fe3ff" fill-opacity=".5"><rect x="1100" y="262" width="40" height="10" rx="2"/><rect x="1100" y="276" width="40" height="10" rx="2"/><rect x="1100" y="248" width="40" height="10" rx="2" class="blink"/></g>
+  <text x="1120" y="232" text-anchor="middle" style="font-size:10px">1,5V</text>
+  <!-- board -->
+  <rect x="1166" y="206" width="170" height="26" rx="3" fill="#8fe3ff" fill-opacity=".18" stroke="#fff" stroke-width="1.2"/>
+  <g fill="#1542d0" stroke="#fff" stroke-width="1"><rect x="1180" y="212" width="34" height="14" rx="2"/><rect x="1222" y="214" width="20" height="10" rx="2"/><rect x="1250" y="212" width="30" height="14" rx="2"/></g>
+  <path class="ln" stroke-width="1.2" stroke="#8fe3ff" d="M1292 219 h6 l3 -5 l6 10 l6 -10 l6 10 l3 -5 h6"/>
+  <circle cx="1197" cy="219" r="2.2" fill="#8fe3ff" class="led"/>
+  <!-- motor + gears -->
+  <rect x="1180" y="250" width="100" height="44" rx="10" fill="#1542d0" stroke="#fff" stroke-width="1.4"/>
+  <path class="ln" stroke-width="1" stroke-opacity=".6" d="M1196 254 V290 M1212 254 V290 M1228 254 V290 M1244 254 V290 M1260 254 V290"/>
+  <path class="ln" stroke-width="3" d="M1280 272 H1292"/>
+  <g class="spin"><polygon points="1333.9,269.9 1333.9,274.1 1328.7,275.7 1327.7,278.8 1330.9,283.2 1328.5,286.5 1323.3,284.9 1320.7,286.8 1320.7,292.2 1316.8,293.5 1313.6,289.1 1310.4,289.1 1307.2,293.5 1303.3,292.2 1303.3,286.8 1300.7,284.9 1295.5,286.5 1293.1,283.2 1296.3,278.8 1295.3,275.7 1290.1,274.1 1290.1,269.9 1295.3,268.3 1296.3,265.2 1293.1,260.8 1295.5,257.5 1300.7,259.1 1303.3,257.2 1303.3,251.8 1307.2,250.5 1310.4,254.9 1313.6,254.9 1316.8,250.5 1320.7,251.8 1320.7,257.2 1323.3,259.1 1328.5,257.5 1330.9,260.8 1327.7,265.2 1328.7,268.3" fill="#1542d0" stroke="#fff" stroke-width="1.4"/><circle cx="1312" cy="272" r="6.6" fill="none" stroke="#fff" stroke-width="1.2"/></g>
+  <g class="spinr"><polygon points="1366.9,302.2 1366.9,305.8 1363.3,307.2 1362.2,309.7 1363.8,313.3 1361.3,315.8 1357.7,314.2 1355.2,315.3 1353.8,318.9 1350.2,318.9 1348.8,315.3 1346.3,314.2 1342.7,315.8 1340.2,313.3 1341.8,309.7 1340.7,307.2 1337.1,305.8 1337.1,302.2 1340.7,300.8 1341.8,298.3 1340.2,294.7 1342.7,292.2 1346.3,293.8 1348.8,292.7 1350.2,289.1 1353.8,289.1 1355.2,292.7 1357.7,293.8 1361.3,292.2 1363.8,294.7 1362.2,298.3 1363.3,300.8" fill="#1542d0" stroke="#fff" stroke-width="1.4"/><circle cx="1352" cy="304" r="4.5" fill="none" stroke="#fff" stroke-width="1.2"/></g>
+  <path class="ln" stroke-width="1.2" stroke-opacity=".6" d="M1352 319 V330 Q1352 340 1340 340"/>
+  <!-- cartridge + drive -->
+  <rect class="rod" x="1086" y="346" width="110" height="12" rx="2" fill="url(#hatch)" stroke="#fff" stroke-width="1"/>
+  <rect x="1160" y="322" width="260" height="60" rx="10" fill="none" stroke="#fff" stroke-width="1.6"/>
+  <g clip-path="url(#cart)">
+    <rect class="fill" x="1208" y="324" width="210" height="56" fill="url(#ins)"/>
+    <g class="plunger"><rect x="1194" y="324" width="14" height="56" fill="#1542d0" stroke="#fff" stroke-width="1.4"/><path class="ln" stroke-width="1" d="M1198 324 V380 M1204 324 V380"/></g>
+  </g>
+  <g class="plunger"><rect x="1180" y="346" width="16" height="12" fill="#1542d0" stroke="#fff" stroke-width="1"/></g>
+  <path class="ln" stroke-width="1" stroke-opacity=".7" d="M1250 382 V374 M1280 382 V376 M1310 382 V374 M1340 382 V376 M1370 382 V374 M1400 382 V376"/>
+  <path d="M1420 338 H1440 V366 H1420" fill="#1542d0" stroke="#fff" stroke-width="1.4"/>
+  <path class="ln core" stroke="#8fe3ff" stroke-width="2" d="M1420 352 H1490"/>
+  <!-- pump labels -->
+  <g class="ln" stroke-width="1" stroke-opacity=".7"><path d="M1120 200 V172 M1240 206 V172 M1312 250 V172 M1120 358 V458 M1300 382 V458 M1464 380 V458"/></g>
+  <g class="sub" style="font-size:10px">
+    <text x="1084" y="166">БАТАРЕЯ</text><text x="1190" y="166">ПЛАТА · BT</text><text x="1296" y="166">ДВИГАТЕЛЬ И РЕДУКТОР</text>
+    <text x="1084" y="472">ВИНТОВОЙ ШТОК</text><text x="1240" y="472">КАРТРИДЖ С ИНСУЛИНОМ</text><text x="1446" y="472">ВЫХОД</text>
+  </g>
+  
+
+  <!-- ===== 05 NIGHTSCOUT ===== -->
+  <g class="ln" stroke-width="1.6">
+    <rect x="1080" y="652" width="64" height="22" rx="4" fill="#1542d0"/>
+    <rect x="1080" y="676" width="64" height="22" rx="4" fill="#1542d0"/>
+    <rect x="1080" y="700" width="64" height="22" rx="4" fill="#1542d0"/>
+    <path stroke-width="1.2" d="M1092 663 H1116 M1092 687 H1116 M1092 711 H1116"/>
+  </g>
+  <g fill="#8fe3ff"><circle class="led" cx="1132" cy="663" r="2.5"/><circle class="led" cx="1132" cy="687" r="2.5" style="animation-delay:.4s"/><circle class="led" cx="1132" cy="711" r="2.5" style="animation-delay:.8s"/></g>
+  <text x="1164" y="668" class="cap"><tspan class="num">05</tspan>  СВОЙ СЕРВЕР NIGHTSCOUT</text>
+  <text x="1164" y="690" class="sub" style="font-size:11px">хранит все данные системы и показывает</text>
+  <text x="1164" y="708" class="sub" style="font-size:11px">их удалённо — себе, близким или врачу</text>
+  <g class="ln" stroke-width="1.4">
+    <rect x="1452" y="714" width="64" height="40" rx="3" fill="#1542d0"/><path d="M1444 760 H1524"/>
+    <path stroke-width="1" stroke="#8fe3ff" d="M1460 744 L1470 732 L1480 738 L1492 724 L1506 730"/>
+    <rect x="1500" y="730" width="20" height="36" rx="4" fill="#1542d0"/>
+  </g>
+
+  <!-- links -->
+  <use href="#pSens" class="flow"/><use href="#pPump" class="flow"/><use href="#pNs" class="flow"/><use href="#pRem" class="flow"/>
+  <g fill="#8fe3ff" filter="url(#glow)">
+    <circle r="4"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#pSens"/></animateMotion></circle>
+    <circle r="4"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite"><mpath href="#pSens"/></animateMotion></circle>
+    <circle r="4"><animateMotion dur="2s" begin=".5s" repeatCount="indefinite"><mpath href="#pPump"/></animateMotion></circle>
+    <circle r="4"><animateMotion dur="2s" begin="1.5s" repeatCount="indefinite"><mpath href="#pPump"/></animateMotion></circle>
+    <circle r="3.5"><animateMotion dur="2s" begin=".3s" repeatCount="indefinite"><mpath href="#pNs"/></animateMotion></circle>
+    <circle r="3.5"><animateMotion dur="3s" begin="1s" repeatCount="indefinite"><mpath href="#pRem"/></animateMotion></circle>
+  </g>
+  <text class="sub" style="font-size:10px" dy="-8"><textPath href="#pSens" startOffset="28%">BLUETOOTH</textPath></text>
+  <text class="sub" style="font-size:10px" dy="-8"><textPath href="#pPump" startOffset="12%">КОМАНДЫ</textPath></text>
+
+  <!-- Disclaimer -->
+  <rect x="0" y="1006" width="1600" height="94" fill="#1D45D8" fill-opacity=".9"/>
+  <path class="ln" stroke-opacity=".4" stroke-width="1" d="M60 1006H1540"/>
+  <path class="ln" stroke-width="1.6" stroke="#8fe3ff" d="M74 1030 L90 1058 H58 Z M74 1041 V1049"/>
+  <circle cx="74" cy="1053.5" r="1.3" fill="#8fe3ff"/>
+  <text x="108" y="1038" style="font-size:13px">Схема лишь демонстрирует возможности DIY-системы, собранной сообществом, и не является призывом к действию.</text>
+  <text x="108" y="1062" class="sub" style="font-size:13px">Любое внедрение подобной системы — только после консультации со специалистом.</text>
+  <text x="1540" y="1062" text-anchor="end" class="sub" style="font-size:11px">DIARWIKI.RU</text>
+</svg>

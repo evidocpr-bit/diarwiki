@@ -1,0 +1,46 @@
+---
+const route = Astro.locals.starlightRoute;
+const body = typeof route.entry.body === 'string' ? route.entry.body : '';
+const markdownItems = route.headings
+  .filter((heading) => heading.depth === 2 || heading.depth === 3)
+  .map((heading) => ({ ...heading, position: body.indexOf(`${'#'.repeat(heading.depth)} ${heading.text}`) }));
+const componentItems = [...body.matchAll(/<ArticleStep\b([\s\S]*?)>/gu)].flatMap((match) => {
+  const number = match[1].match(/\bnumber=\{(\d+)\}/u)?.[1];
+  const text = match[1].match(/\btitle="([^"]+)"/u)?.[1];
+  return number && text && match.index !== undefined ? [{ slug: `step-${number}`, text, depth: 2, position: match.index }] : [];
+});
+if (body.includes('<ArticleSources')) componentItems.push({ slug: 'article-sources-title', text: 'Источники', depth: 2, position: body.lastIndexOf('<ArticleSources') });
+const tocItems = [...markdownItems, ...componentItems].sort((a, b) => a.position - b.position);
+---
+<div class="article-layout">
+  <aside class="article-toc" aria-label="Содержание"><span class="article-toc-title">Содержание</span><nav>{tocItems.map((heading, index) => <a href={`#${heading.slug}`}><span>Ø{String(index + 1).padStart(2, '0')}</span>{heading.text}</a>)}</nav></aside>
+  <div class="sl-markdown-content article-content"><slot /></div>
+</div>
+<script is:inline>
+  document.querySelectorAll('.article-content table').forEach((table) => {
+    if (table.closest('.article-table-scroll')) return;
+    const headers = Array.from(table.querySelectorAll('thead th')).map((cell) => cell.textContent.trim());
+    table.querySelectorAll('tbody tr').forEach((row) => {
+      Array.from(row.children).forEach((cell, index) => {
+        if (headers[index]) cell.setAttribute('data-label', headers[index]);
+      });
+    });
+    const wrapper = document.createElement('div');
+    wrapper.className = 'article-table-scroll';
+    wrapper.setAttribute('role', 'region');
+    wrapper.setAttribute('aria-label', 'Таблица с горизонтальной прокруткой');
+    wrapper.setAttribute('tabindex', '0');
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+</script>
+<style>
+  .article-layout{display:grid;grid-template-columns:minmax(180px,260px) minmax(0,760px);gap:96px;justify-content:center;max-width:1320px;margin:0 auto;padding:96px var(--dw-pad) 140px}.article-toc{align-self:stretch;padding-top:0}.article-toc-title{display:block;margin-bottom:16px;color:var(--dw-blue);font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.14em;text-transform:uppercase}.article-toc nav{position:sticky;top:24px;display:flex;flex-direction:column}.article-toc a{display:grid;grid-template-columns:36px minmax(0,1fr);gap:8px;padding:10px 0;border-bottom:1px dashed var(--dw-line);color:var(--dw-muted);font-size:13px;line-height:1.4;text-decoration:none}.article-toc a span{color:var(--dw-blue);font:400 12px/1.4 var(--dw-font-mono)}.article-toc a:hover,.article-toc a:focus-visible{color:var(--dw-blue);font-weight:600}.article-content{max-width:760px;min-width:0;display:flex;flex-direction:column;gap:72px;font-size:18px;line-height:1.65}.article-content :global(>*){margin-block:0}.article-content :global(h2){margin:0;color:var(--dw-blue);font:600 clamp(26px,3vw,34px)/1.08 var(--dw-font-display);letter-spacing:-.025em}.article-content :global(h3){color:var(--dw-blue);font-family:var(--dw-font-display)}.article-content :global(p){margin:0}.article-content :global(ul),.article-content :global(ol){padding-left:24px}.article-content :global(a){color:var(--dw-blue)}.article-content :global(.article-table-scroll){max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}.article-content :global(.article-table-scroll:focus-visible){outline:2px solid var(--dw-blue);outline-offset:4px}
+  @media(max-width:900px){.article-layout{grid-template-columns:1fr;gap:32px;padding:48px var(--dw-pad) 80px}.article-toc nav{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}.article-content{gap:48px;font-size:17px}}
+  @media(max-width:520px){.article-toc nav{grid-template-columns:1fr}.article-content :global(.article-table-scroll){overflow:visible}.article-content :global(table){display:block;width:100%;min-width:0}.article-content :global(thead){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.article-content :global(tbody),.article-content :global(tr),.article-content :global(td),.article-content :global(tbody th){display:block;width:100%}.article-content :global(tbody tr){padding:12px 0;border-top:1px solid var(--dw-blue)}.article-content :global(td),.article-content :global(tbody th){box-sizing:border-box;min-width:0!important;padding:8px 0!important;border:0!important}.article-content :global(td::before),.article-content :global(tbody th::before){content:attr(data-label);display:block;margin-bottom:3px;color:var(--dw-muted);font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.1em;text-transform:uppercase}}
+  @media (max-width: 760px) {
+    .article-content { gap: 36px; }
+    .article-content :global(table) { min-width: 520px; }
+    .article-content :global(th), .article-content :global(td) { min-width: 110px; padding: 12px; }
+  }
+</style>

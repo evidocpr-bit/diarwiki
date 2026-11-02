@@ -1,0 +1,13 @@
+---
+interface Props { title?: string; }
+const { title = 'Коротко о главном' } = Astro.props;
+---
+<aside class="quick-answer" aria-labelledby="quick-answer-title">
+  <div class="quick-answer__head"><span>[ Ответ за минуту ]</span><span>≈ 30 сек</span></div>
+  <div class="quick-answer__body"><h2 id="quick-answer-title">{title}</h2><div class="quick-answer__text"><slot /></div></div>
+</aside>
+<style>
+  .quick-answer .quick-answer__text :global(a:any-link) { color: #fff; text-decoration: underline; text-decoration-color: rgb(255 255 255 / 65%); text-underline-offset: .18em; }
+  .quick-answer .quick-answer__text :global(a:hover), .quick-answer .quick-answer__text :global(a:focus-visible) { color: #fff; text-decoration-color: #fff; }
+  .quick-answer{margin:0;background:var(--dw-blue);color:#fff}.quick-answer__head{display:flex;justify-content:space-between;gap:16px;padding:12px 24px;border-bottom:1px solid var(--dw-line-on-blue);font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.16em;text-transform:uppercase}.quick-answer__body{padding:24px 24px 28px;display:flex;flex-direction:column;gap:10px}.quick-answer h2{margin:0;color:#fff;font:600 26px/1.15 var(--dw-font-display);letter-spacing:-.02em}.quick-answer__text{color:rgb(255 255 255 / 90%);font-size:17px;line-height:1.55}.quick-answer__text :global(p){margin:0}.quick-answer__text :global(p+p){margin-top:12px}
+</style>

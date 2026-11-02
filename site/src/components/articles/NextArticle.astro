@@ -1,0 +1,13 @@
+---
+interface Props { href: string; title: string; description: string; }
+const { href, title, description } = Astro.props;
+import { contentRepository } from '../../lib/content';
+const articles = await contentRepository.listPublished('article');
+const currentSlug = Astro.locals.starlightRoute.entry.id;
+const currentIndex = articles.findIndex((article) => article.slug === currentSlug);
+const nextNumber = currentIndex >= 0 ? Math.min(currentIndex + 2, articles.length) : 2;
+---
+<a class="next-article" href={href}><span><small>Следующий · Ø{nextNumber} из {articles.length}</small><strong>{title}</strong><span class="next-article__description">{description}</span></span><span class="next-article__arrow" aria-hidden="true">→</span></a>
+<style>
+  .next-article{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:16px;align-items:center;margin:0;padding:28px;background:var(--dw-blue);color:#fff;text-decoration:none}.next-article>span:first-child{display:flex;flex-direction:column;gap:8px}.next-article small{font:400 11px/1.4 var(--dw-font-mono);letter-spacing:.16em;text-transform:uppercase}.next-article strong{font:600 28px/1.1 var(--dw-font-display);letter-spacing:-.02em}.next-article__description{font-size:14px;line-height:1.5;color:rgb(255 255 255 / 82%)}.next-article__arrow{font:400 40px/1 var(--dw-font-display);text-align:center}
+</style>

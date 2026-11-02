@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+  <title id="title">Как выбрать Telegram-сообщество</title>
+  <desc id="desc">Маршрут из четырёх шагов: вопрос, раздел, проверка и участие.</desc>
+  <rect width="1440" height="810" fill="#fbfaf5"/>
+  <g fill="none" stroke="#d7d4c8" stroke-width="2" opacity=".85">
+    <path d="M82 126H1358" stroke-dasharray="4 12"/><path d="M82 684H1358" stroke-dasharray="4 12"/>
+    <path d="M164 88V722" stroke-dasharray="4 14"/><path d="M1276 88V722" stroke-dasharray="4 14"/>
+  </g>
+  <text x="82" y="90" fill="#173b64" font-family="JetBrains Mono, monospace" font-size="18" letter-spacing="4">МАРШРУТ ПЕРЕД ВСТУПЛЕНИЕМ</text>
+  <text x="1358" y="90" text-anchor="end" fill="#173b64" font-family="JetBrains Mono, monospace" font-size="18">Ø4</text>
+  <path d="M276 410C390 410 418 316 520 316S672 474 786 474 938 350 1052 350 1154 410 1234 410" fill="none" stroke="#173b64" stroke-width="4" stroke-linecap="round"/>
+  <path d="M1000 334L1016 350 1000 366" fill="none" stroke="#173b64" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    <circle cx="230" cy="410" r="86" fill="#fbfaf5" stroke="#173b64" stroke-width="4"/><circle cx="234" cy="406" r="86" fill="none" stroke="#173b64" stroke-width="1.5" opacity=".48"/><text x="230" y="419" fill="#173b64" font-size="29" font-weight="650">Вопрос</text><text x="230" y="530" fill="#173b64" font-family="JetBrains Mono, monospace" font-size="16">Ø1 · ЧТО НУЖНО?</text>
+    <rect x="444" y="242" width="190" height="148" rx="40" fill="#173b64"/><rect x="449" y="247" width="180" height="138" rx="36" fill="none" stroke="#fbfaf5" stroke-width="1.5" opacity=".35"/><text x="539" y="326" fill="#fff" font-size="29" font-weight="650">Раздел</text><text x="539" y="424" fill="#173b64" font-family="JetBrains Mono, monospace" font-size="16">Ø2 · ГДЕ ИСКАТЬ?</text>
+    <circle cx="806" cy="474" r="112" fill="#e76f51" stroke="#173b64" stroke-width="4"/><circle cx="800" cy="480" r="112" fill="none" stroke="#173b64" stroke-width="1.5" opacity=".45"/><text x="806" y="484" fill="#172333" font-size="31" font-weight="700">Проверка</text><text x="806" y="626" fill="#173b64" font-family="JetBrains Mono, monospace" font-size="16">Ø3 · ДАТА И ПРАВИЛА</text>
+    <path d="M1080 290H1260L1298 350 1260 410H1080L1042 350Z" fill="#fbfaf5" stroke="#173b64" stroke-width="4" stroke-linejoin="round"/><path d="M1085 296H1254L1291 350 1254 404H1085L1049 350Z" fill="none" stroke="#173b64" stroke-width="1.5" opacity=".4"/><text x="1170" y="360" fill="#173b64" font-size="29" font-weight="650">Участие</text><text x="1170" y="460" fill="#173b64" font-family="JetBrains Mono, monospace" font-size="16">Ø4 · БЕЗ ЛИШНИХ ДАННЫХ</text>
+  </g>
+  <text x="82" y="742" fill="#173b64" font-family="Inter, Arial, sans-serif" font-size="20">Чужой опыт помогает искать решение — но не становится назначением.</text>
+</svg>

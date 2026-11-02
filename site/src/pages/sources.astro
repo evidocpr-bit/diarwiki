@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import TextPageLayout from '../layouts/TextPageLayout.astro';
+const sources = (await getCollection('sources')).sort((a, b) => a.data.organization.localeCompare(b.data.organization, 'ru'));
+---
+<TextPageLayout title="Источники" description="Реестр основных источников, использованных в стартовых материалах «ДиарВики»." eyebrow="Проверяемость" updated="20 октября 2026 года">
+  <p>Запись в этом списке означает, что источник использован для конкретного материала. Она не означает одобрение всех публикаций организации или применимость любого совета к отдельному человеку.</p>
+  <ul class="source-list">
+    {sources.map(({ data }) => (
+      <li>
+        <a href={data.url} target="_blank" rel="noreferrer">{data.title}</a>
+        <span>{data.organization} · язык: {data.language.toUpperCase()} · обращение: {data.accessedAt.toLocaleDateString('ru-RU')}</span>
+        {data.note && <p>{data.note}</p>}
+      </li>
+    ))}
+  </ul>
+</TextPageLayout>
+<style>
+  .source-list { padding: 0; list-style: none; }
+  .source-list li { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+  .source-list a { display: block; color: var(--navy); font-size: 1.08rem; font-weight: 750; }
+  .source-list span { display: block; margin-top: .35rem; color: var(--ink-muted); font-size: .86rem; }
+  .source-list p { margin-bottom: 0; color: var(--ink-muted); }
+</style>

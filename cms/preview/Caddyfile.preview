@@ -1,0 +1,31 @@
+preview.diarwiki.ru {
+	encode zstd gzip
+
+	@access path /access
+	handle @access {
+		reverse_proxy 127.0.0.1:8061
+	}
+
+	handle {
+		route {
+			forward_auth 127.0.0.1:8061 {
+				uri /authorize
+				copy_headers X-Preview-Id
+			}
+			rewrite * /p/{http.request.header.X-Preview-Id}{uri}
+			try_files {path} {path}/index.html
+			root * /srv/diarwiki-previews
+			header {
+				Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+				Permissions-Policy "accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+				Referrer-Policy "no-referrer"
+				X-Content-Type-Options "nosniff"
+				X-Frame-Options "DENY"
+				X-Robots-Tag "noindex, nofollow, noarchive"
+				Cache-Control "private, no-store"
+				-Server
+			}
+			file_server
+		}
+	}
+}

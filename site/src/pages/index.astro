@@ -1,0 +1,209 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { routePaths } from '../config/site';
+import { contentRepository } from '../lib/content';
+import { getLibraryResources } from '../lib/library';
+import RouteFolder from '../components/RouteFolder.astro';
+import Icon from '../components/Icon.astro';
+
+const [publishedArticles, allSources] = await Promise.all([
+  contentRepository.listPublished('article'),
+  getCollection('sources'),
+]);
+const sensorArticles = publishedArticles.filter((article) => article.topics.includes('Датчики'));
+const articleBySlug = (slug: string) => publishedArticles.find((article) => article.slug.endsWith(slug));
+const firstKnowledge = [articleBySlug('what-is-diabetes'), articleBySlug('after-diagnosis')].filter((article) => article !== undefined);
+const resourceCount = getLibraryResources().length;
+const sourceCount = allSources.length;
+const lastUpdated = publishedArticles.reduce<Date | null>((latest, article) => !latest || article.updatedAt > latest ? article.updatedAt : latest, null);
+const lastUpdatedLabel = lastUpdated?.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }) ?? '';
+const padCount = (count: number) => count < 10 ? `Ø${count}` : String(count);
+const folders = [
+  { number: '01', kind: 'Старт', title: 'Диагноз поставили недавно', text: 'Термины и вопросы к следующему приёму', href: routePaths.start, icon: 'document', count: 3, items: [articleBySlug('what-is-diabetes')?.title, articleBySlug('after-diagnosis')?.title, articleBySlug('glossary')?.title].filter((item): item is string => Boolean(item)) },
+  { number: '02', kind: 'Датчики', title: 'Разбираюсь с датчиком', text: 'Экран, расхождения, потеря связи', href: sensorArticles[0]?.href ?? routePaths.knowledge, icon: 'sensor', count: sensorArticles.length, items: sensorArticles.slice(0, 3).map((item) => item.title) },
+  { number: '03', kind: 'Чтение', title: 'Выбираю книгу или приложение', text: 'С разбором пользы и ограничений', href: routePaths.library, icon: 'book', count: resourceCount, items: ['Книги и пособия', 'Приложения', 'Исследования'] },
+  { number: '04', kind: 'Близким', title: 'Помогаю близкому', text: 'Понимать ситуацию и быть рядом', href: articleBySlug('cgm-sharing')?.href ?? routePaths.start, icon: 'people', count: 2, items: [articleBySlug('cgm-sharing')?.title, articleBySlug('prepare-for-appointment')?.title].filter((item): item is string => Boolean(item)) },
+];
+---
+<BaseLayout title="Диабет 1 типа — понятно, спокойно и со ссылками" description="Просветительский справочник о диабете 1 типа: понятные материалы, источники, даты обновления и честный статус проверки.">
+  <section class="on-blue home-hero" data-testid="home-hero" style="background-color:var(--b);color:#FFFFFF;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:96px 96px">
+    <div class="home-hero-layout" style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,140px) var(--pad) clamp(72px,9vw,128px);display:flex;flex-wrap:wrap;gap:72px;align-items:center">
+      <div class="home-hero-copy" style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:36px">
+        <div class="dw-label" style="display:flex;gap:20px;flex-wrap:wrap"><span>[Ø1] Справочник</span><span style="opacity:.7">Обновлено {lastUpdatedLabel}</span></div>
+        <h1 class="home-hero-title">
+          <span>Диабет 1 типа</span>
+          <span>понятно, спокойно</span>
+          <span>и со ссылками</span>
+        </h1>
+        <p style="margin:0;max-width:32rem;font-size:19px;line-height:1.55;color:rgba(255,255,255,.86)">У каждого ответа — источники, дата обновления и честный статус врачебной проверки.</p>
+        <form role="search" action={routePaths.search} method="get" style="display:flex;max-width:620px;background:#FFFFFF;position:relative">
+          <label for="hero-q" class="sr-only">Ваш вопрос о диабете</label>
+          <input id="hero-q" name="q" type="search" placeholder="Например: почему датчик показывает меньше глюкометра" style="flex:1 1 auto;min-width:0;height:64px;border:0;padding:0 22px;font:inherit;font-size:17px;color:var(--ink);background:transparent" />
+          <button class="hero-submit" type="submit" aria-label="Найти" style="flex:0 0 auto;height:64px;padding:0 26px;border:0;background:var(--bd);color:#FFFFFF;font-family:var(--dw-font-mono);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer"><span class="hero-submit-text">Найти </span>↗</button>
+        </form>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <span class="dw-label" style="font-size:11px;opacity:.7;margin-right:6px">Часто ищут</span>
+          {sensorArticles.slice(0, 2).map((article) => <a href={article.href} style="padding:9px 14px;border:1px solid rgba(255,255,255,.5);text-decoration:none;font-size:14px">{article.title.replace(/ глюкозы$/u, '')}</a>)}
+          <a href={routePaths.glucoseTool} style="padding:9px 14px;border:1px solid rgba(255,255,255,.5);text-decoration:none;font-size:14px">ммоль/л ↔ мг/дл</a>
+        </div>
+      </div>
+      <figure class="bp sugar-hero" style="flex:1 1 440px;min-width:0;margin:0">
+        <img src="/sugar-cube-v4.svg" alt="Кубик сахара" width="1000" height="1000" decoding="async" style="display:block;width:100%;height:auto" />
+      </figure>
+    </div>
+  </section>
+
+  <section aria-label="Коротко о справочнике" style="border-bottom:1px solid var(--b)">
+    <div class="passport dw-container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+      <div style="padding:36px 28px 36px 0;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px"><span class="dw-label" style="font-size:11px;color:var(--muted)">Материалов</span><span style="font:500 44px/1 var(--dw-font-mono);color:var(--b)">{padCount(publishedArticles.length)}</span></div>
+      <div style="padding:36px 28px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px"><span class="dw-label" style="font-size:11px;color:var(--muted)">Ресурсов в библиотеке</span><span style="font:500 44px/1 var(--dw-font-mono);color:var(--b)">{resourceCount}</span></div>
+      <div style="padding:36px 28px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px"><span class="dw-label" style="font-size:11px;color:var(--muted)">Источников в реестре</span><span style="font:500 44px/1 var(--dw-font-mono);color:var(--b)">{sourceCount}</span></div>
+      <div style="padding:36px 0 36px 28px;display:flex;flex-direction:column;gap:10px"><span class="dw-label" style="font-size:11px;color:var(--muted)">У каждой статьи</span><span style="font-size:17px;line-height:1.4">источники, дата пересмотра и статус проверки</span></div>
+    </div>
+  </section>
+
+  <section class="home-section" style="padding:var(--dw-section) 0">
+    <div class="dw-container" style="display:flex;flex-direction:column;gap:64px">
+      <div class="reveal" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:20px"><span class="dw-label" style="color:var(--b)">[Ø2] Маршруты</span><h2 style="margin:0;font-family:var(--dw-font-display);font-weight:600;font-size:clamp(36px,4.4vw,60px);line-height:.98;letter-spacing:-.03em;color:var(--b)">Начните с того,<br />что важно сейчас</h2></div>
+        <p style="margin:0;max-width:24rem;font-size:17px;line-height:1.6;color:var(--muted)">Четыре папки — четыре ситуации. Внутри материалы уже разложены по порядку.</p>
+      </div>
+      <div data-testid="home-routes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px">
+        {folders.map((folder) => <RouteFolder href={folder.href} tab={`Ø${folder.number} · ${folder.kind}`} title={folder.title} description={folder.text} icon={folder.icon} items={folder.items} count={folder.count} />)}
+      </div>
+    </div>
+  </section>
+
+  {sensorArticles.length > 0 && <section class="on-blue sensor-section" style="padding:22px 0;background:var(--b);color:#FFFFFF">
+    <div class="dw-container dw-label sensor-section-label" style="padding-top:0;padding-bottom:0;border-bottom:1px solid rgba(255,255,255,.45);font-size:11px"><span>[Ø3] Раздел · датчики</span><span style="float:right">{sensorArticles.length} материала · по порядку</span></div>
+    <div class="dw-container sensor-layout" style="display:grid;grid-template-columns:minmax(0, .85fr) minmax(0, 1.15fr)">
+      <div class="reveal sensor-intro" style="min-width:0;padding:clamp(56px,7vw,96px) 56px clamp(56px,7vw,96px) 0;border-right:1px solid rgba(255,255,255,.45);display:flex;flex-direction:column;gap:24px">
+        <h2 style="margin:0;font-family:var(--dw-font-display);font-weight:600;font-size:clamp(36px,4.4vw,60px);line-height:.98;letter-spacing:-.03em">От первой цифры до связи с близкими</h2>
+        <p style="margin:0;font-size:17px;line-height:1.6;color:rgba(255,255,255,.86)">Как читать экран, что делать при потере данных и как устроен удалённый просмотр.</p>
+        <img src="/images/blueprints/home-glucose-monitoring-v2.svg" alt="Упрощённая схема экрана мониторинга глюкозы: текущее показание, стрелка направления, показатели и график" width="1536" height="864" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;margin-top:8px;border:1px solid rgba(255,255,255,.45)" />
+      </div>
+      <ol class="sensor-list" style="margin:0;padding:0 0 0 40px;list-style:none">
+        {sensorArticles.slice(0, 3).map((article, index) => <li class="sensor-row" style="display:grid;grid-template-columns:80px minmax(0,1fr) 28px;gap:20px;align-items:center;padding:40px 8px 40px 0;border-bottom:1px solid rgba(255,255,255,.45)"><span class="sensor-number" style="font:400 36px/1 var(--dw-font-mono)">Ø{index + 1}</span><span class="sensor-copy" style="display:flex;flex-direction:column;gap:10px"><a href={article.href} style="font-family:var(--dw-font-display);font-weight:600;font-size:25px;letter-spacing:-.015em;color:white;text-decoration:none">{article.title}</a><span style="font-size:15px;line-height:1.55;color:rgba(255,255,255,.8)">{article.summary}</span></span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span></li>)}
+      </ol>
+    </div>
+  </section>}
+
+  <section class="home-section" style="padding:var(--dw-section) 0">
+    <div class="dw-container" style="display:flex;flex-direction:column;gap:56px">
+      <div class="reveal" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px"><div style="display:flex;flex-direction:column;gap:20px"><span class="dw-label" style="color:var(--b)">[Ø4] База знаний</span><h2 style="margin:0;font-family:var(--dw-font-display);font-weight:600;font-size:clamp(36px,4.4vw,60px);line-height:.98;letter-spacing:-.03em;color:var(--b)">Первые материалы</h2></div><a class="foot-link" href={routePaths.knowledge} style="font:400 13px/1.4 var(--dw-font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--b);text-decoration:none;border-bottom:1px dashed var(--b);padding-bottom:6px">Все материалы <span class="arrow">↗</span></a></div>
+      <div class="reveal home-knowledge-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));border-top:1px solid var(--b);border-left:1px solid var(--b)">
+        {firstKnowledge.map((article, index) => <a class="cell row-link" href={article.href} style="min-height:280px;padding:32px;border-right:1px solid var(--b);border-bottom:1px solid var(--b);display:flex;flex-direction:column;gap:14px;text-decoration:none;color:var(--ink)"><span class="dw-label" style="display:flex;justify-content:space-between;font-size:11px;color:var(--b)">{article.topics[0]}<span>Ø{index + 1}</span></span><span style="margin-top:auto;font-family:var(--dw-font-display);font-weight:600;font-size:25px;line-height:1.12;letter-spacing:-.015em">{article.title}</span><span style="font-size:15px;line-height:1.55;color:var(--muted)">{article.summary}</span><span class="dw-label" style={`display:flex;justify-content:space-between;font-size:11px;letter-spacing:.1em;color:${article.medicalReview === 'reviewed' ? 'var(--b)' : 'var(--muted)'}`}>{article.medicalReview === 'reviewed' ? '✓ Проверено врачом' : 'Материал редакции'}<span class="arrow" style="font-size:18px;color:var(--b)">↗</span></span></a>)}
+        <a class="cell icon-host" href={routePaths.glucoseTool} style="min-height:280px;padding:32px;border-right:1px solid var(--b);border-bottom:1px solid var(--b);display:flex;flex-direction:column;gap:14px;text-decoration:none;background:var(--b);color:#FFFFFF"><span class="dw-label" style="display:flex;justify-content:space-between;align-items:start;font-size:11px;letter-spacing:.14em;text-transform:uppercase">Инструмент<Icon name="convert" size={36} /></span><span style="margin-top:auto;font:400 40px/1 var(--dw-font-mono);letter-spacing:-.02em">5,6 → 101</span><span style="font-family:var(--dw-font-display);font-weight:600;font-size:21px">Перевод ммоль/л ↔ мг/дл</span><span class="dw-label" style="display:flex;justify-content:space-between;font-size:11px;letter-spacing:.1em;opacity:.85">Считается в браузере<span class="arrow" style="font-size:18px">↗</span></span></a>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid var(--b);border-bottom:1px solid var(--b)">
+    <div class="dw-container reveal trust-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <div style="padding:72px 40px 72px 0;display:flex;flex-direction:column;gap:18px"><span class="dw-label" style="color:var(--b)">[Ø5] Как устроено</span><h2 style="margin:0;font-family:var(--dw-font-display);font-weight:600;font-size:36px;line-height:1.02;letter-spacing:-.03em;color:var(--b)">Можно проверить, откуда взялся ответ</h2></div>
+      <div class="icon-host" style="padding:72px 40px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:14px"><Icon name="link" /><strong style="font-family:var(--dw-font-display);font-size:21px;font-weight:600">Источники видны</strong><span style="font-size:15px;line-height:1.6;color:var(--muted)">Рядом с утверждением — первоисточник и граница применимости.</span></div>
+      <div class="icon-host" style="padding:72px 40px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:14px"><Icon name="check-doc" /><strong style="font-family:var(--dw-font-display);font-size:21px;font-weight:600">Проверка привязана к версии</strong><span style="font-size:15px;line-height:1.6;color:var(--muted)">Отметка врача снимается, если текст изменился после рецензии.</span></div>
+      <div class="icon-host" style="padding:72px 0 72px 40px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:14px"><Icon name="shield" /><strong style="font-family:var(--dw-font-display);font-size:21px;font-weight:600">Границы обозначены</strong><span style="font-size:15px;line-height:1.6;color:var(--muted)">Сайт объясняет, но не назначает лечение и не считает дозы.</span></div>
+    </div>
+  </section>
+  <section class="founder-section" aria-labelledby="founder-title" data-testid="founder-story">
+    <div class="dw-container founder-heading">
+      <span class="dw-label">[Ø6] Личный опыт</span>
+      <h2 id="founder-title">Мой путь к замкнутому циклу</h2>
+    </div>
+    <figure class="on-blue founder-diagram">
+      <picture>
+        <source media="(prefers-reduced-motion: reduce)" srcset="/images/blueprints/diarwiki-loop-hero-static-v1.svg" />
+        <img src="/images/blueprints/diarwiki-loop-hero-v1.svg" alt="Система замкнутого цикла Степана: сенсор, телефон, помпа, катетер и Nightscout" width="1600" height="1100" loading="lazy" decoding="async" />
+      </picture>
+      <figcaption class="dw-container"><span>Схема моей системы · не инструкция по сборке</span><a href="/images/blueprints/diarwiki-loop-hero-v1.svg" target="_blank" rel="noopener">Открыть крупнее ↗</a></figcaption>
+    </figure>
+    <div class="dw-container founder-comment">
+      <div class="founder-signature"><span class="dw-label">От автора проекта</span><p>Пономарев<br />Степан Андреевич</p></div>
+      <div class="founder-copy">
+        <p>Меня зовут Пономарев Степан Андреевич. На схеме — моя система искусственной поджелудочной железы и то, как связаны её компоненты. Я пришёл к ней спустя шесть лет изучения диабета, собственного тела и открытых технологий диабетического сообщества.</p>
+        <p>Такую систему не освоить, просто установив сенсор и прочитав пару статей. Нужны знания, практика и понимание того, что делать, если что-то перестало работать. Мой путь — не обязательный маршрут для каждого и не рекомендация повторять мою сборку.</p>
+        <p>Открытые технологии дают больше вариантов, но доступность зависит от оборудования, расходников и поддержки. Поэтому я не хочу обещать, что любая самостоятельная сборка окажется дешевле готовой системы производителя.</p>
+        <p>Диабет меняет повседневную жизнь. Очень хочется верить, что наука однажды изменит и эту реальность. А пока приходится учиться жить с тем, что есть сегодня.</p>
+        <p>Я создаю ДиарВики, чтобы этот путь было проще пройти: находить понятные объяснения, разбираться в технологиях и готовить вопросы врачу. Мне хочется, чтобы у человека с диабетом было больше свободы и меньше повседневной нагрузки — без гонки за идеальными цифрами.</p>
+        <p class="founder-wish">Дорогой друг, желаю тебе удачи на этом непростом пути!</p>
+        <aside class="founder-note">Это личный опыт, а не медицинская рекомендация. Самостоятельная автоматизация подачи инсулина связана с рисками. Выбор терапии и её изменения обсуждайте с лечащим врачом.</aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .sugar-hero { width: 100%; align-self: center; }
+  .home-hero-title {
+    max-width: none;
+    margin: 0;
+    font-family: var(--dw-font-display);
+    font-size: clamp(42px, 5.6vw, 80px);
+    font-weight: 600;
+    line-height: .96;
+    letter-spacing: -.04em;
+  }
+  .home-hero-title > span { display: block; white-space: nowrap; }
+  @media (min-width: 1000px) {
+    .home-hero-layout { display: grid !important; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 40px !important; }
+  }
+  @media (max-width: 999px) {
+    .sugar-hero { max-width: 560px; margin-inline: auto !important; flex-basis: 100% !important; }
+  }
+  .founder-section { padding-top: var(--dw-section); }
+  .founder-heading { padding-bottom: 40px; color: var(--b); }
+  .founder-heading h2 { margin: 20px 0 0; max-width: 20ch; font: 600 clamp(32px, 4.4vw, 60px)/1.04 var(--dw-font-display); letter-spacing: -.03em; text-wrap: pretty; }
+  .founder-diagram { margin: 0; background: var(--b); color: white; }
+  .founder-diagram picture, .founder-diagram img { display: block; width: 100%; }
+  .founder-diagram img { height: auto; max-width: 1600px; margin-inline: auto; }
+  .founder-diagram figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding-block: 18px; border-top: 1px solid var(--dw-line-on-blue); font-size: 14px; line-height: 1.5; }
+  .founder-diagram a { color: white; text-underline-offset: 4px; }
+  .founder-comment { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 64px; padding-block: clamp(40px, 6vw, 88px); }
+  .founder-signature { color: var(--b); }
+  .founder-signature p { margin: 20px 0 0; font: 600 26px/1.2 var(--dw-font-display); letter-spacing: -.02em; }
+  .founder-copy { min-width: 0; max-width: 66ch; font-size: 18px; line-height: 1.7; color: var(--ink); }
+  .founder-copy p { margin: 0 0 24px; }
+  .founder-copy .founder-wish { margin-block: 32px; color: var(--b); font: 600 clamp(24px, 2.5vw, 32px)/1.25 var(--dw-font-display); letter-spacing: -.02em; }
+  .founder-note { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+  @media (max-width: 760px) {
+    .founder-section { padding-top: 56px; }
+    .founder-heading { padding-bottom: 28px; }
+    .founder-comment { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .founder-copy { font-size: 17px; line-height: 1.65; }
+    .founder-signature p { margin-top: 12px; font-size: 23px; }
+  }
+  .sensor-layout > *, .trust-grid > * { min-width: 0; }
+  .sensor-copy a { line-height: 1.15; }
+  @media (max-width: 900px) {
+    .sensor-layout { grid-template-columns: minmax(0, 1fr) !important; }
+    .sensor-intro { padding: 36px 0 !important; border-right: 0 !important; border-bottom: 1px solid var(--dw-line-on-blue); }
+    .sensor-intro h2 { max-width: 22ch; font-size: clamp(30px, 5vw, 42px) !important; line-height: 1.08 !important; text-wrap: pretty; }
+    .sensor-intro p { max-width: 55ch; }
+    .sensor-list { padding: 0 !important; }
+    .sensor-row { grid-template-columns: 48px minmax(0, 1fr) 20px !important; gap: 14px !important; align-items: start !important; padding: 28px 0 !important; }
+    .sensor-number { font-size: 28px !important; }
+    .sensor-copy a { font-size: 23px !important; }
+  }
+  @media (max-width: 760px) {
+    .home-section { padding: 64px 0 !important; }
+    .home-section > .dw-container { gap: 36px !important; }
+    .home-hero-layout { padding-block: 48px !important; gap: 36px !important; }
+    .home-hero-copy { gap: 24px !important; }
+    .home-hero-copy a { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+    .home-hero-title { font-size: clamp(31px, 9vw, 52px) !important; line-height: 1 !important; }
+    .home-hero-copy > p { font-size: 17px !important; line-height: 1.55 !important; }
+    .home-section h2 { font-size: clamp(30px, 7.8vw, 40px) !important; line-height: 1.05 !important; text-wrap: pretty; }
+    .sensor-section-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 16px; font-size: 10px !important; line-height: 1.6; }
+    .sensor-row { grid-template-columns: 38px minmax(0, 1fr) 18px !important; gap: 10px !important; padding: 24px 0 !important; }
+    .sensor-copy a { font-size: 21px !important; }
+    .sensor-copy > span { font-size: 15px !important; line-height: 1.55 !important; }
+    .trust-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    .home-knowledge-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    .home-knowledge-grid > a { min-height: 0 !important; padding: 24px !important; }
+    .trust-grid > div { padding: 24px 0 !important; border-left: 0 !important; border-top: 1px solid var(--dw-line); gap: 12px !important; }
+    .trust-grid > div:first-child { padding-block: 32px !important; border-top: 0; }
+    .trust-grid h2 { max-width: 24ch; font-size: 30px !important; line-height: 1.08 !important; text-wrap: pretty; }
+    .trust-grid strong { font-size: 21px !important; line-height: 1.2; }
+  }
+</style>

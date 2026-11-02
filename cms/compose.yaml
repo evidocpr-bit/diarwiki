@@ -1,0 +1,128 @@
+name: diarwiki-cms
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - cms-postgres:/var/lib/postgresql/data
+    networks:
+      - cms-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+
+  directus:
+    image: ${DIRECTUS_IMAGE}
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8055:8055"
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8055"
+      PUBLIC_URL: ${PUBLIC_URL}
+      SECRET: ${DIRECTUS_SECRET}
+      LICENSE_KEY: ${DIRECTUS_LICENSE_KEY}
+
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      EMAIL_TRANSPORT: ${EMAIL_TRANSPORT}
+      EMAIL_FROM: ${EMAIL_FROM}
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+      EMAIL_SMTP_SECURE: "false"
+
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE}
+      REFRESH_TOKEN_COOKIE_SECURE: ${SESSION_COOKIE_SECURE}
+      SESSION_COOKIE_SAME_SITE: lax
+      REFRESH_TOKEN_COOKIE_SAME_SITE: lax
+      HSTS_ENABLED: ${HSTS_ENABLED}
+      IP_TRUST_PROXY: "true"
+
+      CORS_ENABLED: "false"
+      RATE_LIMITER_ENABLED: "true"
+      RATE_LIMITER_POINTS: "50"
+      RATE_LIMITER_DURATION: "1"
+      RATE_LIMITER_REGISTRATION_ENABLED: "true"
+      RATE_LIMITER_REGISTRATION_POINTS: "3"
+      RATE_LIMITER_REGISTRATION_DURATION: "60"
+      PRESSURE_LIMITER_ENABLED: "true"
+
+      FILES_MAX_UPLOAD_SIZE: 20mb
+      FILES_MIME_TYPE_ALLOW_LIST: image/jpeg,image/png,image/webp,image/gif,image/svg+xml,application/pdf
+      STORAGE_LOCATIONS: local
+      STORAGE_LOCAL_DRIVER: local
+      STORAGE_LOCAL_ROOT: /directus/uploads
+      ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION: "12000"
+      IMPORT_IP_DENY_LIST: 0.0.0.0,::1,169.254.169.254
+      FLOWS_ENV_ALLOW_LIST: "false"
+      TELEMETRY: "false"
+      WEBSOCKETS_ENABLED: "false"
+      LOG_LEVEL: info
+      LOG_STYLE: json
+    volumes:
+      - cms-uploads:/directus/uploads
+      - ./extensions:/directus/extensions:ro
+      - ./templates:/directus/templates:ro
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    networks:
+      - cms-backend
+      - cms-edge
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8055/server/health').then((response)=>{if(!response.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+
+networks:
+  cms-backend:
+    driver: bridge
+    internal: true
+  cms-edge:
+    driver: bridge
+
+volumes:
+  cms-postgres:
+  cms-uploads:
+  cms-snapshots:
+

@@ -1,0 +1,9 @@
+{
+  "id": "nightscout-security",
+  "title": "Nightscout Security and Privacy",
+  "organization": "Nightscout Foundation",
+  "url": "https://nightscout.github.io/nightscout/security/",
+  "language": "en",
+  "accessedAt": "2026-11-02",
+  "note": "Официальная документация о публичном доступе по умолчанию, AUTH_DEFAULT_ROLES, токенах и роли readable. API_SECRET и административные токены нельзя передавать для обычного просмотра."
+}

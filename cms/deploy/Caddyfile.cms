@@ -1,0 +1,21 @@
+cms.diarwiki.ru {
+	encode zstd gzip
+
+	@forbidden method TRACE TRACK
+	respond @forbidden 405
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+		X-Robots-Tag "noindex, nofollow, noarchive"
+		-Server
+	}
+
+	reverse_proxy 127.0.0.1:8055 {
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Host {host}
+	}
+}

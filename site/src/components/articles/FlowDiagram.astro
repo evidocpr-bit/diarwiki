@@ -1,0 +1,35 @@
+---
+interface Item { label: string; note?: string; }
+interface Props { title: string; items: Item[]; caption?: string; }
+const { title, items, caption } = Astro.props;
+---
+
+<figure class="flow" aria-label={title}>
+  <figcaption class="flow__head"><span>Fig. Ø — маршрут</span><span>{items.length} этапа · схема упрощена</span></figcaption>
+  <div class="flow__title"><strong>{title}</strong>{caption && <span>{caption}</span>}</div>
+  <ol>
+    {items.map((item, index) => (
+      <li>
+        <span class="flow__number">Ø{String(index + 1).padStart(2, '0')}</span>
+        <div><strong>{item.label}</strong>{item.note && <small>{item.note}</small>}</div>
+        <span class="flow__arrow" aria-hidden="true">↗</span>
+      </li>
+    ))}
+  </ol>
+</figure>
+
+<style>
+  .flow { margin: 0; border: 1px solid var(--dw-blue); background: var(--dw-blue); color: var(--dw-white); }
+  .flow__head { display: flex; justify-content: space-between; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--dw-line-on-blue); color: var(--dw-white); font: 400 11px/1.4 var(--dw-font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .flow__title { padding: 24px 20px 18px; border-bottom: 1px solid var(--dw-line-on-blue); }
+  .flow__title strong { display: block; color: var(--dw-white); font: 600 24px/1.12 var(--dw-font-display); }
+  .flow__title span { display: block; margin-top: 8px; color: rgb(255 255 255 / 84%); font-size: 15px; line-height: 1.5; }
+  .flow ol { display: flex; flex-direction: column; margin: 0; padding: 0 20px; list-style: none; }
+  .flow li { display: grid; grid-template-columns: 64px minmax(0,1fr) 24px; gap: 14px; align-items: start; padding: 20px 0; border-bottom: 1px solid var(--dw-line-on-blue); }
+  .flow li:last-child { border-bottom: 0; }
+  .flow__number { color: var(--dw-white); font: 400 20px/1.2 var(--dw-font-mono); }
+  .flow li strong { display: block; color: var(--dw-white); font: 600 18px/1.25 var(--dw-font-display); }
+  .flow small { display: block; margin-top: 5px; color: rgb(255 255 255 / 82%); font: 400 14px/1.5 var(--dw-font-text); }
+  .flow__arrow { color: var(--dw-white); text-align: right; }
+  @media (max-width: 42rem) { .flow__head { font-size: 9px; } .flow__title { padding-inline: 16px; } .flow ol { padding-inline: 16px; } .flow li { grid-template-columns: 48px minmax(0,1fr) 20px; gap: 10px; } }
+</style>

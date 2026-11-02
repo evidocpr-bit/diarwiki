@@ -1,0 +1,17 @@
+[Unit]
+Description=Encrypted DiarWiki CMS backup
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/diarwiki
+ExecStart=/opt/diarwiki/cms/deploy/backup-cms.sh
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/backups/diarwiki-cms /tmp
+UMask=0077
+TimeoutStartSec=60min

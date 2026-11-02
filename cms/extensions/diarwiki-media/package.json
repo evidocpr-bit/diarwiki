@@ -1,0 +1,26 @@
+{
+  "name": "directus-extension-diarwiki-media",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "scripts": {
+    "build": "directus-extension build",
+    "test": "node --test ../../tests/media-policy.test.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "directus:extension": {
+    "type": "hook",
+    "path": "dist/index.js",
+    "source": "src/index.ts",
+    "host": "^12.5.0"
+  },
+  "dependencies": {
+    "@directus/errors": "3.0.0"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "18.0.6",
+    "@types/node": "24.10.0",
+    "typescript": "5.9.3"
+  }
+}

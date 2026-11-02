@@ -1,0 +1,36 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { siteIdentity } from '../config/site';
+interface Props { title: string; description: string; eyebrow?: string; updated?: string; }
+const { title, description, eyebrow = siteIdentity.name, updated } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <header class="text-hero">
+    <div class="dw-container text-hero-copy">
+      <p class="eyebrow">{eyebrow}{updated && <> · Обновлено {updated}</>}</p>
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </div>
+  </header>
+  <article class="container reading prose">
+    <slot />
+  </article>
+</BaseLayout>
+<style>
+  .reading { width: min(calc(100% - 2 * var(--dw-pad)), var(--dw-reading)); }
+  .text-hero { padding: 76px 0 52px; border-bottom: 1px solid var(--dw-blue); background: var(--dw-paper); }
+  .text-hero-copy { max-width: var(--dw-reading); }
+  .text-hero .eyebrow { color: var(--dw-blue); font: 400 11px/1.5 var(--dw-font-mono); letter-spacing: .14em; text-transform: uppercase; }
+  .text-hero h1 { max-width: 16ch; margin: 18px 0; color: var(--dw-blue); font: 600 clamp(40px, 5.4vw, 76px)/.98 var(--dw-font-display); letter-spacing: -.035em; }
+  .text-hero-copy > p:last-child { max-width: 42rem; margin: 0; color: var(--dw-muted); font-size: 18px; line-height: 1.55; }
+  .prose { padding-block: 64px 100px; }
+  .prose :global(h2) { margin: 48px 0 14px; color: var(--dw-blue); font: 600 clamp(26px, 3vw, 34px)/1.08 var(--dw-font-display); letter-spacing: -.025em; }
+  .prose :global(h2:first-child) { margin-top: 0; }
+  .prose :global(h3) { margin-top: 32px; color: var(--dw-blue); font-family: var(--dw-font-display); }
+  .prose :global(p), .prose :global(li) { font-size: 18px; line-height: 1.65; }
+  .prose :global(li + li) { margin-top: .5rem; }
+  .prose :global(a) { color: var(--dw-blue); font-weight: 600; text-decoration-thickness: 1px; }
+  .prose :global(.notice) { margin: 2rem 0; padding: 18px 20px; border: 1px solid var(--dw-blue); background: transparent; color: var(--dw-ink); }
+  .prose :global(code) { color: var(--dw-blue-deep); background: transparent; font-family: var(--dw-font-mono); }
+  @media (max-width: 760px) { .text-hero { padding: 48px 0 32px; } .text-hero h1 { font-size: clamp(40px, 12vw, 56px); } .prose { padding-block: 48px 72px; } .prose :global(p), .prose :global(li) { font-size: 17px; } }
+</style>

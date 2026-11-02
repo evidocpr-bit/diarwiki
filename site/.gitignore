@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.pagefind/
+playwright-report/
+test-results/
+.playwright-browsers/
+design-reference/
+output/
+*.log
