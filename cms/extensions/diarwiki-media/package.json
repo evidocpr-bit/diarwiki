@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@directus/extensions-sdk": "18.0.6",
-    "@types/node": "24.10.0",
+    "@types/node": "26.6.6",
     "typescript": "5.9.3"
   }
 }
